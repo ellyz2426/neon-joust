@@ -203,6 +203,12 @@ export class UISystem extends createSystem({
       } else {
         this.setText(findEl('txt-wind'), '');
       }
+      // Wave preview (incoming enemies)
+      if (gameState.wavePreviewTimer > 0 && gameState.wavePreviewText) {
+        this.setText(findEl('txt-wave-preview'), gameState.wavePreviewText);
+      } else {
+        this.setText(findEl('txt-wave-preview'), '');
+      }
     } else if (panel === 'results') {
       this.setText(findEl('txt-final-score'), `SCORE: ${gameState.score}`);
       this.setText(findEl('txt-final-wave'), `WAVE: ${gameState.wave}`);

@@ -1,4 +1,4 @@
-<panel width="440" height="560" backgroundColor="#000a18" backgroundOpacity="0.95" borderRadius="12" borderColor="#00ffff" borderWidth="2" flexDirection="column" alignItems="center" padding="14" gap="4">
+<panel width="440" height="600" backgroundColor="#000a18" backgroundOpacity="0.95" borderRadius="12" borderColor="#00ffff" borderWidth="2" flexDirection="column" alignItems="center" padding="14" gap="4">
   <text content="HOW TO PLAY" fontSize="26" fontWeight="bold" color="#00ffff" marginBottom="4"/>
   <text content="Flap to fly! Joust enemies from above!" fontSize="13" color="#cccccc"/>
   <text content="Higher lance wins the joust." fontSize="13" color="#cccccc"/>
@@ -9,7 +9,7 @@
   <text content="" fontSize="4" color="#000000"/>
   <text content="ENEMIES:" fontSize="15" fontWeight="bold" color="#ff4444"/>
   <text content="Green=Bounder | Yellow=Hunter | Red=Shadow(2HP)" fontSize="12" color="#aaaaaa"/>
-  <text content="Orange=Dragon King (BOSS, 5+HP, shoots fire!)" fontSize="12" color="#ff6600"/>
+  <text content="Pink=Charger (fast dashes!) | Boss=Dragon King" fontSize="12" color="#ff88ff"/>
   <text content="Boss every 5 waves. Collect eggs before hatch!" fontSize="12" color="#aaaaaa"/>
   <text content="" fontSize="4" color="#000000"/>
   <text content="POWER-UPS:" fontSize="15" fontWeight="bold" color="#ff44ff"/>
@@ -17,6 +17,7 @@
   <text content="Green Speed - Faster movement + flap" fontSize="12" color="#44ff44"/>
   <text content="Pink Magnet - Attracts nearby eggs" fontSize="12" color="#ff44ff"/>
   <text content="Gold 2x Score - Doubles all points" fontSize="12" color="#ffcc00"/>
+  <text content="Ice Freeze - Slows all enemies to 25%" fontSize="12" color="#88ddff"/>
   <text content="" fontSize="4" color="#000000"/>
   <text content="MODES:" fontSize="15" fontWeight="bold" color="#00aaaa"/>
   <text content="Arcade=Classic | Speed=120s | Zen=Inf | Challenge=5HP" fontSize="12" color="#aaaaaa"/>

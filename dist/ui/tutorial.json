@@ -88,60 +88,72 @@
                                                                                         "type": "custom",
                                                                                         "children": [
                                                                                           {
-                                                                                            "sourceTag": "panel",
+                                                                                            "sourceTag": "text",
                                                                                             "type": "custom",
                                                                                             "children": [
                                                                                               {
-                                                                                                "sourceTag": "text",
+                                                                                                "sourceTag": "panel",
                                                                                                 "type": "custom",
-                                                                                                "children": [],
+                                                                                                "children": [
+                                                                                                  {
+                                                                                                    "sourceTag": "text",
+                                                                                                    "type": "custom",
+                                                                                                    "children": [],
+                                                                                                    "properties": {
+                                                                                                      "content": "BACK",
+                                                                                                      "fontsize": "15",
+                                                                                                      "fontweight": "bold",
+                                                                                                      "color": "#00ffff"
+                                                                                                    },
+                                                                                                    "dataUid": "uid-25"
+                                                                                                  }
+                                                                                                ],
                                                                                                 "properties": {
-                                                                                                  "content": "BACK",
-                                                                                                  "fontsize": "15",
-                                                                                                  "fontweight": "bold",
-                                                                                                  "color": "#00ffff"
+                                                                                                  "id": "btn-back",
+                                                                                                  "width": "180",
+                                                                                                  "height": "34",
+                                                                                                  "backgroundcolor": "#003344",
+                                                                                                  "backgroundopacity": "0.8",
+                                                                                                  "borderradius": "8",
+                                                                                                  "bordercolor": "#00ffff",
+                                                                                                  "borderwidth": "1",
+                                                                                                  "justifycontent": "center",
+                                                                                                  "alignitems": "center",
+                                                                                                  "cursor": "pointer",
+                                                                                                  "margintop": "6"
                                                                                                 },
                                                                                                 "dataUid": "uid-24"
                                                                                               }
                                                                                             ],
                                                                                             "properties": {
-                                                                                              "id": "btn-back",
-                                                                                              "width": "180",
-                                                                                              "height": "34",
-                                                                                              "backgroundcolor": "#003344",
-                                                                                              "backgroundopacity": "0.8",
-                                                                                              "borderradius": "8",
-                                                                                              "bordercolor": "#00ffff",
-                                                                                              "borderwidth": "1",
-                                                                                              "justifycontent": "center",
-                                                                                              "alignitems": "center",
-                                                                                              "cursor": "pointer",
-                                                                                              "margintop": "6"
+                                                                                              "content": "Arcade=Classic | Speed=120s | Zen=Inf | Challenge=5HP",
+                                                                                              "fontsize": "12",
+                                                                                              "color": "#aaaaaa"
                                                                                             },
                                                                                             "dataUid": "uid-23"
                                                                                           }
                                                                                         ],
                                                                                         "properties": {
-                                                                                          "content": "Arcade=Classic | Speed=120s | Zen=Inf | Challenge=5HP",
-                                                                                          "fontsize": "12",
-                                                                                          "color": "#aaaaaa"
+                                                                                          "content": "MODES:",
+                                                                                          "fontsize": "15",
+                                                                                          "fontweight": "bold",
+                                                                                          "color": "#00aaaa"
                                                                                         },
                                                                                         "dataUid": "uid-22"
                                                                                       }
                                                                                     ],
                                                                                     "properties": {
-                                                                                      "content": "MODES:",
-                                                                                      "fontsize": "15",
-                                                                                      "fontweight": "bold",
-                                                                                      "color": "#00aaaa"
+                                                                                      "content": "",
+                                                                                      "fontsize": "4",
+                                                                                      "color": "#000000"
                                                                                     },
                                                                                     "dataUid": "uid-21"
                                                                                   }
                                                                                 ],
                                                                                 "properties": {
-                                                                                  "content": "",
-                                                                                  "fontsize": "4",
-                                                                                  "color": "#000000"
+                                                                                  "content": "Ice Freeze - Slows all enemies to 25%",
+                                                                                  "fontsize": "12",
+                                                                                  "color": "#88ddff"
                                                                                 },
                                                                                 "dataUid": "uid-20"
                                                                               }
@@ -204,9 +216,9 @@
                                                   }
                                                 ],
                                                 "properties": {
-                                                  "content": "Orange=Dragon King (BOSS, 5+HP, shoots fire!)",
+                                                  "content": "Pink=Charger (fast dashes!) | Boss=Dragon King",
                                                   "fontsize": "12",
-                                                  "color": "#ff6600"
+                                                  "color": "#ff88ff"
                                                 },
                                                 "dataUid": "uid-12"
                                               }
@@ -297,7 +309,7 @@
     ],
     "properties": {
       "width": "440",
-      "height": "560",
+      "height": "600",
       "backgroundcolor": "#000a18",
       "backgroundopacity": "0.95",
       "borderradius": "12",
@@ -318,7 +330,7 @@
         "column": 0
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 8
       }
     },
@@ -328,7 +340,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -338,7 +350,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -348,7 +360,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -358,7 +370,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -368,7 +380,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -378,7 +390,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -388,7 +400,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -398,7 +410,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -408,7 +420,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -418,7 +430,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -428,7 +440,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -438,7 +450,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -448,7 +460,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -458,7 +470,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -468,7 +480,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -478,7 +490,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -488,7 +500,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -498,7 +510,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -508,7 +520,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -518,7 +530,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -528,7 +540,7 @@
         "column": 2
       },
       "end": {
-        "line": 25,
+        "line": 26,
         "column": 0
       }
     },
@@ -538,17 +550,27 @@
         "column": 2
       },
       "end": {
-        "line": 24,
-        "column": 10
+        "line": 26,
+        "column": 0
       }
     },
     "uid-24": {
       "start": {
         "line": 23,
+        "column": 2
+      },
+      "end": {
+        "line": 25,
+        "column": 10
+      }
+    },
+    "uid-25": {
+      "start": {
+        "line": 24,
         "column": 4
       },
       "end": {
-        "line": 24,
+        "line": 25,
         "column": 2
       }
     }

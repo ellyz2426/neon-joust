@@ -120,6 +120,19 @@ const SFX: Record<string, () => void> = {
     playTone(80, 0.3, 0.03, 'sine');
     setTimeout(() => playNoise(0.3, 0.03), 150);
   },
+  freeze: () => {
+    playTone(1200, 0.15, 0.08, 'sine');
+    setTimeout(() => playTone(1000, 0.12, 0.08, 'sine'), 80);
+    setTimeout(() => playTone(800, 0.12, 0.08, 'sine'), 160);
+    setTimeout(() => playTone(600, 0.15, 0.1, 'triangle'), 240);
+    setTimeout(() => playNoise(0.2, 0.04), 100);
+  },
+  charger_dash: () => {
+    playTone(200, 0.08, 0.1, 'sawtooth');
+    setTimeout(() => playTone(350, 0.1, 0.12, 'sawtooth'), 40);
+    setTimeout(() => playTone(500, 0.08, 0.1, 'sawtooth'), 80);
+    playNoise(0.1, 0.06);
+  },
 };
 
 // Melody-driven music system

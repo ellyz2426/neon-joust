@@ -8,9 +8,9 @@ import { gameState, EnemyData, EggData, PowerUpData, ScorePopup, FireballData, L
   POWERUP_COLORS, PowerUpType } from './game-state.js';
 
 const HALF_W = ARENA_W / 2;
-const ENEMY_COLORS: Record<string, number> = { bounder: 0x44ff44, hunter: 0xffff44, shadow: 0xff4444, dragon: 0xff6600 };
-const ENEMY_SCORES: Record<string, number> = { bounder: 100, hunter: 200, shadow: 500, dragon: 2000 };
-const ENEMY_HP: Record<string, number> = { bounder: 1, hunter: 1, shadow: 2, dragon: 5 };
+const ENEMY_COLORS: Record<string, number> = { bounder: 0x44ff44, hunter: 0xffff44, shadow: 0xff4444, dragon: 0xff6600, charger: 0xff88ff };
+const ENEMY_SCORES: Record<string, number> = { bounder: 100, hunter: 200, shadow: 500, dragon: 2000, charger: 350 };
+const ENEMY_HP: Record<string, number> = { bounder: 1, hunter: 1, shadow: 2, dragon: 5, charger: 1 };
 const EGG_SCORE = 150;
 const PTERO_SCORE = 1000;
 const HATCH_TIME = 6;
@@ -22,7 +22,7 @@ const POWERUP_COLLECT_DIST = 1.0;
 const FIREBALL_SPEED = 8;
 const FIREBALL_HIT_DIST = 0.8;
 const BOSS_WAVE_INTERVAL = 5;
-const POWERUP_TYPES: PowerUpType[] = ['shield', 'speed', 'magnet', 'double'];
+const POWERUP_TYPES: PowerUpType[] = ['shield', 'speed', 'magnet', 'double', 'freeze'];
 const LAVA_ERUPTION_INTERVAL = 12;
 const LAVA_ERUPTION_SPEED = 14;
 const LAVA_ERUPTION_HIT_DIST = 0.8;
@@ -39,6 +39,7 @@ function waveEnemies(w: number): { type: string; count: number }[] {
   base.push({ type: 'bounder', count: bounders });
   if (w >= 3) base.push({ type: 'hunter', count: Math.floor((Math.floor((w - 1) / 2)) * dm) || 1 });
   if (w >= 6) base.push({ type: 'shadow', count: Math.floor((Math.floor((w - 4) / 3)) * dm) || 1 });
+  if (w >= 8) base.push({ type: 'charger', count: Math.floor((Math.floor((w - 6) / 3)) * dm) || 1 });
   return base;
 }
 
@@ -199,6 +200,18 @@ function createPowerUpMesh(type: PowerUpType): Group {
     const geo = new TorusGeometry(0.18, 0.06, 6, 8);
     g.add(new Mesh(geo, mat));
     g.add(new LineSegments(new EdgesGeometry(geo), edgeMat));
+  } else if (type === 'freeze') {
+    // Snowflake-like hexagonal shape
+    const geo1 = new BoxGeometry(0.35, 0.08, 0.08);
+    const geo2 = new BoxGeometry(0.35, 0.08, 0.08);
+    const geo3 = new BoxGeometry(0.35, 0.08, 0.08);
+    const m1 = new Mesh(geo1, mat);
+    const m2 = new Mesh(geo2, mat);
+    m2.rotation.z = Math.PI / 3;
+    const m3 = new Mesh(geo3, mat);
+    m3.rotation.z = -Math.PI / 3;
+    g.add(m1); g.add(m2); g.add(m3);
+    g.add(new LineSegments(new EdgesGeometry(geo1), edgeMat));
   } else {
     // double score — star-like shape using two boxes
     const geo1 = new BoxGeometry(0.35, 0.12, 0.12);
@@ -368,6 +381,7 @@ export class GameSystem extends createSystem({}) {
     gameState.activePowerUp = null;
     gameState.powerUpTimer = 0;
     gameState.shieldActive = false;
+    gameState.freezeActive = false;
     gameState.lavaEruptionTimer = LAVA_ERUPTION_INTERVAL;
     gameState.lavaEruptionsDodged = 0;
     gameState.powerUpsThisGame = 0;
@@ -417,9 +431,19 @@ export class GameSystem extends createSystem({}) {
     gameState.noDeathThisWave = true;
     gameState.waveStartTime = gameState.gameTime;
     gameState.waveBonusAwarded = false;
+    // Wave preview text
+    const buildPreview = (specs: { type: string; count: number }[]) => {
+      const parts: string[] = [];
+      for (const s of specs) {
+        const name = s.type.charAt(0).toUpperCase() + s.type.slice(1);
+        parts.push(`${s.count} ${name}${s.count > 1 ? 's' : ''}`);
+      }
+      return parts.join(' + ');
+    };
     // Boss wave every BOSS_WAVE_INTERVAL waves
     if (gameState.wave > 1 && gameState.wave % BOSS_WAVE_INTERVAL === 0) {
       gameState.bossWave = true;
+      gameState.wavePreviewText = 'DRAGON KING + Escorts';
       this.spawnDragon();
       // Spawn fewer regular enemies alongside
       const escorts = Math.floor(gameState.wave / 5);
@@ -429,6 +453,7 @@ export class GameSystem extends createSystem({}) {
     } else {
       gameState.bossWave = false;
       const spec = waveEnemies(gameState.wave);
+      gameState.wavePreviewText = buildPreview(spec);
       for (const s of spec) {
         for (let i = 0; i < s.count; i++) {
           this.spawnEnemy(s.type as any);
@@ -436,15 +461,22 @@ export class GameSystem extends createSystem({}) {
       }
     }
     setTimeout(() => { gameState.waveStarting = false; }, 1500);
+    gameState.wavePreviewTimer = 3.0;
   }
 
   private spawnEnemy(type: string) {
     const side = Math.random() < 0.5 ? -1 : 1;
     const x = side * (HALF_W + 0.5);
     const y = 4 + Math.random() * 8;
-    const { group, wingL, wingR } = createBirdMesh(ENEMY_COLORS[type] ?? 0x44ff44);
+    const color = ENEMY_COLORS[type] ?? 0x44ff44;
+    const { group, wingL, wingR } = createBirdMesh(color);
+    // Chargers are slightly larger and have a sharper look
+    if (type === 'charger') {
+      group.scale.set(1.2 * -side, 1.1, 1.1);
+    } else {
+      group.scale.x = -side;
+    }
     group.position.set(x, y, 0);
-    group.scale.x = -side;
     this.world.scene.add(group);
     this.enemies.push({
       x, y, vx: -side * (1 + Math.random() * 2) * diffMul(), vy: 0,
@@ -452,6 +484,8 @@ export class GameSystem extends createSystem({}) {
       mesh: group, wingL, wingR, alive: true,
       hp: ENEMY_HP[type] ?? 1, maxHp: ENEMY_HP[type] ?? 1,
       hitFlashTimer: 0, fireTimer: 0,
+      dashCooldown: type === 'charger' ? 2 + Math.random() * 2 : 0,
+      dashing: false, dashTimer: 0,
     });
   }
 
@@ -511,6 +545,7 @@ export class GameSystem extends createSystem({}) {
       mesh: group, wingL, wingR, alive: true,
       hp, maxHp: hp, hitFlashTimer: 0,
       fireTimer: 2.5 + Math.random(),
+      dashCooldown: 0, dashing: false, dashTimer: 0,
     });
   }
 
@@ -602,6 +637,14 @@ export class GameSystem extends createSystem({}) {
       gameState.waveTransitionTimer -= dt;
       if (gameState.waveTransitionTimer <= 0) {
         gameState.waveTransition = false;
+      }
+    }
+
+    // Wave preview fade
+    if (gameState.wavePreviewTimer > 0) {
+      gameState.wavePreviewTimer -= dt;
+      if (gameState.wavePreviewTimer <= 0) {
+        gameState.wavePreviewText = '';
       }
     }
 
@@ -948,6 +991,9 @@ export class GameSystem extends createSystem({}) {
       gameState.bossDefeated++;
       gameState.cameraShake = 0.5;
       gameState.sfxAction = 'boss_defeat';
+    } else if (e.type === 'charger') {
+      gameState.chargersDefeated++;
+      gameState.sfxAction = 'joust_win';
     } else {
       gameState.sfxAction = 'joust_win';
     }
@@ -988,10 +1034,14 @@ export class GameSystem extends createSystem({}) {
       this.deactivatePowerUp();
     }
     gameState.activePowerUp = type;
-    gameState.powerUpTimer = POWERUP_DURATION;
+    gameState.powerUpTimer = type === 'freeze' ? 6 : POWERUP_DURATION;
     if (type === 'shield') {
       gameState.shieldActive = true;
       this.addShieldVisual();
+    } else if (type === 'freeze') {
+      gameState.freezeActive = true;
+      gameState.totalFreezes++;
+      gameState.sfxAction = 'freeze';
     }
   }
 
@@ -999,6 +1049,16 @@ export class GameSystem extends createSystem({}) {
     if (gameState.activePowerUp === 'shield') {
       gameState.shieldActive = false;
       this.removeShieldVisual();
+    }
+    if (gameState.activePowerUp === 'freeze') {
+      gameState.freezeActive = false;
+      // Restore enemy colors
+      for (const e of this.enemies) {
+        if (e.alive) {
+          const body = e.mesh.children[0] as Mesh;
+          if (body) (body.material as MeshBasicMaterial).color.setHex(ENEMY_COLORS[e.type] ?? 0x44ff44);
+        }
+      }
     }
     gameState.activePowerUp = null;
     gameState.powerUpTimer = 0;
@@ -1034,11 +1094,13 @@ export class GameSystem extends createSystem({}) {
   }
 
   private updateEnemies(dt: number) {
+    const freezeMul = gameState.freezeActive ? 0.25 : 1.0;
     for (const e of this.enemies) {
       if (!e.alive) continue;
+      const eDt = dt * freezeMul;
       // Hit flash
       if (e.hitFlashTimer > 0) {
-        e.hitFlashTimer -= dt;
+        e.hitFlashTimer -= dt; // flash timing not affected by freeze
         const body = e.mesh.children[0] as Mesh;
         if (body) {
           (body.material as MeshBasicMaterial).opacity = Math.floor(e.hitFlashTimer * 20) % 2 === 0 ? 0.9 : 0.2;
@@ -1048,20 +1110,55 @@ export class GameSystem extends createSystem({}) {
           if (body2) (body2.material as MeshBasicMaterial).opacity = 0.7;
         }
       }
-      e.flapTimer -= dt;
-      if (e.flapTimer <= 0) {
-        const flapRate = e.type === 'shadow' ? 0.4 : e.type === 'dragon' ? 0.5 : e.type === 'hunter' ? 0.7 : 1.0;
-        e.flapTimer = flapRate + Math.random() * flapRate;
-        e.vy = Math.min(e.vy + FLAP_IMPULSE * 0.8, MAX_VY * 0.8);
+      // Freeze tint
+      if (gameState.freezeActive) {
+        const body = e.mesh.children[0] as Mesh;
+        if (body) (body.material as MeshBasicMaterial).color.setHex(0x88ddff);
       }
-      if (e.type === 'hunter' || e.type === 'shadow' || e.type === 'dragon') {
+      e.flapTimer -= eDt;
+      if (e.flapTimer <= 0) {
+        const flapRate = e.type === 'shadow' ? 0.4 : e.type === 'dragon' ? 0.5 : e.type === 'charger' ? 0.6 : e.type === 'hunter' ? 0.7 : 1.0;
+        e.flapTimer = flapRate + Math.random() * flapRate;
+        e.vy = Math.min(e.vy + FLAP_IMPULSE * 0.8 * freezeMul, MAX_VY * 0.8);
+      }
+      if (e.type === 'charger') {
+        // Charger AI: flies around, periodically dashes at player horizontally at high speed
+        const spd = 2.5;
+        const tx = gameState.playerAlive ? gameState.playerX : 0;
+        if (!e.dashing) {
+          if (tx > e.x + 0.5) e.vx += spd * eDt * diffMul();
+          else if (tx < e.x - 0.5) e.vx -= spd * eDt * diffMul();
+          e.dashCooldown -= eDt;
+          // Dash when aligned horizontally with player and cooldown ready
+          if (e.dashCooldown <= 0 && gameState.playerAlive) {
+            const dy = Math.abs(gameState.playerY - e.y);
+            if (dy < 2.0) {
+              e.dashing = true;
+              e.dashTimer = 0.6;
+              const dir = gameState.playerX > e.x ? 1 : -1;
+              e.vx = dir * 14 * diffMul() * freezeMul;
+              e.vy = 0;
+              gameState.sfxAction = 'charger_dash';
+            } else {
+              e.dashCooldown = 1.5 + Math.random();
+            }
+          }
+        } else {
+          e.dashTimer -= eDt;
+          if (e.dashTimer <= 0) {
+            e.dashing = false;
+            e.dashCooldown = 3 + Math.random() * 2;
+            e.vx *= 0.3;
+          }
+        }
+      } else if (e.type === 'hunter' || e.type === 'shadow' || e.type === 'dragon') {
         const spd = e.type === 'dragon' ? 3 : e.type === 'shadow' ? 4 : 2.5;
         const tx = gameState.playerAlive ? gameState.playerX : 0;
-        if (tx > e.x + 0.5) e.vx += spd * dt * diffMul();
-        else if (tx < e.x - 0.5) e.vx -= spd * dt * diffMul();
+        if (tx > e.x + 0.5) e.vx += spd * eDt * diffMul();
+        else if (tx < e.x - 0.5) e.vx -= spd * eDt * diffMul();
         // Dragon breathes fire
         if (e.type === 'dragon' && gameState.playerAlive) {
-          e.fireTimer -= dt;
+          e.fireTimer -= eDt;
           if (e.fireTimer <= 0) {
             e.fireTimer = 2.0 + Math.random() * 1.5;
             this.spawnFireball(e.x, e.y, e.facing);
@@ -1073,21 +1170,21 @@ export class GameSystem extends createSystem({}) {
             const distToPlayer = Math.sqrt(dxToPlayer * dxToPlayer + dyToPlayer * dyToPlayer);
             // Swoop if above player and within horizontal range
             if (e.y > gameState.playerY + 2 && distToPlayer < 8 && Math.abs(dxToPlayer) < 5) {
-              e.vy -= 15 * dt; // Dive toward player
-              e.vx += (dxToPlayer > 0 ? 1 : -1) * 8 * dt; // Track horizontally
+              e.vy -= 15 * eDt; // Dive toward player
+              e.vx += (dxToPlayer > 0 ? 1 : -1) * 8 * eDt; // Track horizontally
             }
           }
         }
       } else {
-        if (Math.random() < 0.02) e.vx += (Math.random() - 0.5) * 3;
+        if (Math.random() < 0.02) e.vx += (Math.random() - 0.5) * 3 * freezeMul;
       }
-      e.vy += GRAVITY * dt;
+      e.vy += GRAVITY * eDt;
       e.vx *= DRAG;
-      const maxSpd = e.type === 'dragon' ? MOVE_SPEED * 0.7 : MOVE_SPEED;
+      const maxSpd = e.type === 'dragon' ? MOVE_SPEED * 0.7 : e.type === 'charger' && e.dashing ? 16 : MOVE_SPEED;
       e.vx = Math.max(-maxSpd, Math.min(maxSpd, e.vx));
       e.vy = Math.max(-MAX_VY, Math.min(MAX_VY * 0.8, e.vy));
-      e.x += e.vx * dt;
-      e.y += e.vy * dt;
+      e.x += e.vx * eDt;
+      e.y += e.vy * eDt;
       e.x = wrapX(e.x);
       if (e.y > ARENA_H - 0.5) { e.y = ARENA_H - 0.5; e.vy = -1; }
       const land = landOnPlatform(e.x, e.y, e.vy, 0.4);
@@ -1095,10 +1192,20 @@ export class GameSystem extends createSystem({}) {
       if (e.y < LAVA_Y + 0.3) { e.y = LAVA_Y + 0.3; e.vy = 5; }
       e.facing = e.vx >= 0 ? 1 : -1;
       e.mesh.position.set(e.x, e.y, 0);
-      e.mesh.scale.x = e.facing * (e.type === 'dragon' ? 1.5 : 1);
-      const wingAngle = Math.sin(performance.now() * 0.012 + e.x) * 0.4;
+      const scaleX = e.type === 'dragon' ? 1.5 : e.type === 'charger' ? 1.2 : 1;
+      e.mesh.scale.x = e.facing * scaleX;
+      const wingAngle = Math.sin(performance.now() * 0.012 + e.x) * 0.4 * (e.dashing ? 2 : 1);
       e.wingL.rotation.x = wingAngle;
       e.wingR.rotation.x = -wingAngle;
+    }
+    // Restore colors after freeze ends
+    if (!gameState.freezeActive) {
+      for (const e of this.enemies) {
+        if (e.alive) {
+          const body = e.mesh.children[0] as Mesh;
+          if (body) (body.material as MeshBasicMaterial).color.setHex(ENEMY_COLORS[e.type] ?? 0x44ff44);
+        }
+      }
     }
   }
 
@@ -1139,6 +1246,8 @@ export class GameSystem extends createSystem({}) {
           mesh: group, wingL, wingR, alive: true,
           hp: ENEMY_HP[hatchType] ?? 1, maxHp: ENEMY_HP[hatchType] ?? 1,
           hitFlashTimer: 0, fireTimer: 0,
+          dashCooldown: hatchType === 'charger' ? 2 + Math.random() * 2 : 0,
+          dashing: false, dashTimer: 0,
         });
         gameState.sfxAction = 'hatch';
         continue;

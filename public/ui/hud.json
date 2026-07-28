@@ -150,7 +150,20 @@
               {
                 "sourceTag": "text",
                 "type": "custom",
-                "children": [],
+                "children": [
+                  {
+                    "sourceTag": "text",
+                    "type": "custom",
+                    "children": [],
+                    "properties": {
+                      "id": "txt-wave-preview",
+                      "content": "",
+                      "fontsize": "10",
+                      "color": "#aaddff"
+                    },
+                    "dataUid": "uid-15"
+                  }
+                ],
                 "properties": {
                   "id": "txt-wind",
                   "content": "",
@@ -182,7 +195,7 @@
     ],
     "properties": {
       "width": "420",
-      "height": "88",
+      "height": "100",
       "backgroundcolor": "#000000",
       "backgroundopacity": "0.5",
       "borderradius": "8",
@@ -200,7 +213,7 @@
         "column": 0
       },
       "end": {
-        "line": 17,
+        "line": 18,
         "column": 8
       }
     },
@@ -310,7 +323,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 17,
         "column": 10
       }
     },
@@ -320,7 +333,7 @@
         "column": 4
       },
       "end": {
-        "line": 16,
+        "line": 17,
         "column": 2
       }
     },
@@ -330,7 +343,17 @@
         "column": 4
       },
       "end": {
+        "line": 17,
+        "column": 2
+      }
+    },
+    "uid-15": {
+      "start": {
         "line": 16,
+        "column": 4
+      },
+      "end": {
+        "line": 17,
         "column": 2
       }
     }

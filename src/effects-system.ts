@@ -6,12 +6,15 @@ import { gameState, COLOR_SCHEMES, POWERUP_COLORS, ARENA_W, LAVA_Y } from './gam
 interface Particle { mesh: Mesh; vx: number; vy: number; vz: number; life: number; maxLife: number; }
 interface Orb { mesh: Mesh; baseY: number; speed: number; phase: number; }
 interface Ember { mesh: Mesh; x: number; y: number; vx: number; vy: number; life: number; wobble: number; }
+interface Trail { mesh: Mesh; life: number; maxLife: number; }
 
 export class EffectsSystem extends createSystem({}) {
 
   private particles: Particle[] = [];
   private orbs: Orb[] = [];
   private embers: Ember[] = [];
+  private trails: Trail[] = [];
+  private trailTimer = 0;
   private prevScore = 0;
   private prevWave = 0;
   private prevPowerUp: string | null = null;
@@ -269,6 +272,36 @@ export class EffectsSystem extends createSystem({}) {
     if (!gameState.playerAlive && this.prevPlayerAlive) {
       this.deathExplosion(gameState.playerX, gameState.playerY);
       this.deathBurstDone = true;
+    }
+
+    // Player flying trail — small accent-colored particles behind player
+    if (gameState.screen === 'playing' && gameState.playerAlive && !gameState.playerOnGround) {
+      this.trailTimer -= dt;
+      if (this.trailTimer <= 0) {
+        this.trailTimer = 0.04;
+        const geo = new SphereGeometry(0.03, 4, 3);
+        const mat = new MeshBasicMaterial({ color: gameState.accentColor, transparent: true, opacity: 0.5 });
+        const mesh = new Mesh(geo, mat);
+        mesh.position.set(
+          gameState.playerX - gameState.playerFacing * 0.3 + (Math.random() - 0.5) * 0.1,
+          gameState.playerY - 0.2,
+          (Math.random() - 0.5) * 0.3,
+        );
+        this.world.scene.add(mesh);
+        this.trails.push({ mesh, life: 0.4, maxLife: 0.4 });
+      }
+    }
+    for (let i = this.trails.length - 1; i >= 0; i--) {
+      const t = this.trails[i];
+      t.life -= dt;
+      if (t.life <= 0) {
+        this.world.scene.remove(t.mesh);
+        this.trails.splice(i, 1);
+        continue;
+      }
+      const ratio = t.life / t.maxLife;
+      (t.mesh.material as MeshBasicMaterial).opacity = ratio * 0.5;
+      t.mesh.scale.setScalar(ratio * 0.8);
     }
     // Respawn sparkle — trigger once when player comes back alive
     if (gameState.playerAlive && !this.prevPlayerAlive) {

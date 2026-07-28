@@ -1,4 +1,4 @@
-<panel width="420" height="88" backgroundColor="#000000" backgroundOpacity="0.5" borderRadius="8" flexDirection="column" alignItems="center" padding="4">
+<panel width="420" height="100" backgroundColor="#000000" backgroundOpacity="0.5" borderRadius="8" flexDirection="column" alignItems="center" padding="4">
   <panel width="400" flexDirection="row" justifyContent="space-between" alignItems="center">
     <text id="txt-score" content="SCORE: 0" fontSize="16" fontWeight="bold" color="#00ffff"/>
     <text id="txt-wave" content="WAVE 1" fontSize="16" fontWeight="bold" color="#ffffff"/>
@@ -14,5 +14,6 @@
   <panel width="400" flexDirection="row" justifyContent="center" alignItems="center" gap="12">
     <text id="txt-streak" content="" fontSize="11" fontWeight="bold" color="#ff8844"/>
     <text id="txt-wind" content="" fontSize="11" color="#88ccff"/>
+    <text id="txt-wave-preview" content="" fontSize="10" color="#aaddff"/>
   </panel>
 </panel>

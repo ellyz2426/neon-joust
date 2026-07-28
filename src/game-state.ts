@@ -1,8 +1,8 @@
 // Neon Joust VR — Shared game state
 export type GameMode = 'arcade' | 'speed' | 'zen' | 'challenge';
 export type Difficulty = 'normal' | 'hard' | 'insane';
-export type EnemyType = 'bounder' | 'hunter' | 'shadow' | 'dragon';
-export type PowerUpType = 'shield' | 'speed' | 'magnet' | 'double';
+export type EnemyType = 'bounder' | 'hunter' | 'shadow' | 'dragon' | 'charger';
+export type PowerUpType = 'shield' | 'speed' | 'magnet' | 'double' | 'freeze';
 
 export const COLOR_SCHEMES = [0x00ffff, 0x44ff88, 0xff44aa, 0xffcc00];
 export const COLOR_NAMES = ['CYAN', 'GREEN', 'MAGENTA', 'GOLD'];
@@ -37,6 +37,7 @@ export interface EnemyData {
   mesh: any; wingL: any; wingR: any; alive: boolean;
   hp: number; maxHp: number; hitFlashTimer: number;
   fireTimer: number;
+  dashCooldown: number; dashing: boolean; dashTimer: number;
 }
 
 export interface EggData {
@@ -95,6 +96,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'kill_streak3', name: 'Air Ace', desc: '3-kill streak without landing' },
   { id: 'kill_streak5', name: 'Sky Fury', desc: '5-kill streak without landing' },
   { id: 'survivor', name: 'Survivor', desc: 'Survive 20 waves in Arcade' },
+  { id: 'freezer', name: 'Ice Age', desc: 'Freeze enemies 5 times' },
+  { id: 'charger_slayer', name: 'Charger Slayer', desc: 'Defeat 10 chargers' },
 ];
 
 export const POWERUP_COLORS: Record<PowerUpType, number> = {
@@ -102,6 +105,7 @@ export const POWERUP_COLORS: Record<PowerUpType, number> = {
   speed: 0x44ff44,
   magnet: 0xff44ff,
   double: 0xffcc00,
+  freeze: 0x88ddff,
 };
 
 export const POWERUP_NAMES: Record<PowerUpType, string> = {
@@ -109,6 +113,7 @@ export const POWERUP_NAMES: Record<PowerUpType, string> = {
   speed: 'SPEED',
   magnet: 'MAGNET',
   double: '2x SCORE',
+  freeze: 'FREEZE',
 };
 
 export const gameState = {
@@ -157,6 +162,7 @@ export const gameState = {
   activePowerUp: null as PowerUpType | null,
   powerUpTimer: 0,
   shieldActive: false,
+  freezeActive: false,
 
   // Boss
   bossWave: false,
@@ -182,6 +188,13 @@ export const gameState = {
   windForce: 0,
   windTimer: 0,
 
+  // Wave preview
+  wavePreviewText: '' as string,
+  wavePreviewTimer: 0,
+
+  // Charger enemies defeated
+  chargersDefeated: 0,
+
   // Stats
   totalGames: 0,
   totalScoreAll: 0,
@@ -194,6 +207,7 @@ export const gameState = {
   totalPterosAll: 0,
   totalPlayTime: 0,
   totalPowerUps: 0,
+  totalFreezes: 0,
   achievements: {} as Record<string, boolean>,
 
   get accentColor(): number {
@@ -220,6 +234,8 @@ export const gameState = {
         this.totalPterosAll = d.totalPterosAll ?? 0;
         this.totalPlayTime = d.totalPlayTime ?? 0;
         this.totalPowerUps = d.totalPowerUps ?? 0;
+        this.totalFreezes = d.totalFreezes ?? 0;
+        this.chargersDefeated = d.chargersDefeated ?? 0;
         this.bossDefeated = d.bossDefeated ?? 0;
         this.achievements = d.achievements ?? {};
         this.soundEnabled = d.soundEnabled ?? true;
@@ -238,6 +254,8 @@ export const gameState = {
         totalEggsAll: this.totalEggsAll, totalWavesAll: this.totalWavesAll,
         totalPterosAll: this.totalPterosAll, totalPlayTime: this.totalPlayTime,
         totalPowerUps: this.totalPowerUps,
+        totalFreezes: this.totalFreezes,
+        chargersDefeated: this.chargersDefeated,
         bossDefeated: this.bossDefeated,
         achievements: this.achievements, soundEnabled: this.soundEnabled,
         musicEnabled: this.musicEnabled, colorScheme: this.colorScheme,
@@ -279,5 +297,7 @@ export const gameState = {
     ck('kill_streak3', this.bestKillStreak >= 3);
     ck('kill_streak5', this.bestKillStreak >= 5);
     ck('survivor', this.mode === 'arcade' && this.bestWave >= 20);
+    ck('freezer', this.totalFreezes >= 5);
+    ck('charger_slayer', this.chargersDefeated >= 10);
   },
 };
