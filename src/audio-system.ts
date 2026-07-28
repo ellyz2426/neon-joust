@@ -1,4 +1,4 @@
-// Neon Joust VR — Audio system
+// Neon Joust VR — Audio system with melody-driven music
 import { createSystem } from '@iwsdk/core';
 import { gameState } from './game-state.js';
 
@@ -77,31 +77,113 @@ const SFX: Record<string, () => void> = {
     setTimeout(() => playTone(200, 0.3, 0.1, 'sawtooth'), 200);
     setTimeout(() => playTone(100, 0.5, 0.08, 'sawtooth'), 400);
   },
+  powerup: () => {
+    playTone(400, 0.08, 0.1, 'sine');
+    setTimeout(() => playTone(600, 0.08, 0.1, 'sine'), 50);
+    setTimeout(() => playTone(800, 0.08, 0.1, 'sine'), 100);
+    setTimeout(() => playTone(1000, 0.1, 0.12, 'sine'), 150);
+    setTimeout(() => playTone(1200, 0.15, 0.1, 'sine'), 200);
+  },
+  shield_break: () => {
+    playNoise(0.2, 0.12);
+    playTone(300, 0.15, 0.1, 'sawtooth');
+    setTimeout(() => playTone(200, 0.1, 0.08, 'sawtooth'), 100);
+  },
 };
 
-let musicOsc1: OscillatorNode | null = null;
-let musicGain: GainNode | null = null;
+// Melody-driven music system
+const MELODY_NOTES = [
+  // C minor pentatonic phrases
+  [262, 311, 349, 392, 466, 523],  // C4, Eb4, F4, G4, Bb4, C5
+  [196, 233, 262, 311, 349, 392],  // G3, Bb3, C4, Eb4, F4, G4
+];
+
+const BASS_NOTES = [65, 73, 87, 98]; // C2, D2, F2, G2
+
+let musicNodes: { osc: OscillatorNode; gain: GainNode }[] = [];
+let musicTimer: ReturnType<typeof setInterval> | null = null;
 let musicPlaying = false;
+let melodyStep = 0;
+let bassStep = 0;
+
+function playMelodyNote() {
+  if (!gameState.musicEnabled || !musicPlaying) return;
+  try {
+    const c = getCtx();
+    const wave = Math.min(gameState.wave, MELODY_NOTES.length) - 1;
+    const notes = MELODY_NOTES[Math.max(0, wave)] ?? MELODY_NOTES[0];
+    const freq = notes[melodyStep % notes.length];
+    const dur = 0.15 + Math.random() * 0.1;
+
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(freq, c.currentTime);
+    g.gain.setValueAtTime(0.04, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+    o.connect(g).connect(c.destination);
+    o.start();
+    o.stop(c.currentTime + dur);
+
+    melodyStep++;
+    // Every 4th note, play bass
+    if (melodyStep % 4 === 0) {
+      const bassFreq = BASS_NOTES[bassStep % BASS_NOTES.length];
+      const bo = c.createOscillator();
+      const bg = c.createGain();
+      bo.type = 'sine';
+      bo.frequency.setValueAtTime(bassFreq, c.currentTime);
+      bg.gain.setValueAtTime(0.05, c.currentTime);
+      bg.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.4);
+      bo.connect(bg).connect(c.destination);
+      bo.start();
+      bo.stop(c.currentTime + 0.4);
+      bassStep++;
+    }
+  } catch {}
+}
 
 function startMusic() {
   if (musicPlaying || !gameState.musicEnabled) return;
   try {
     const c = getCtx();
-    musicOsc1 = c.createOscillator();
-    musicGain = c.createGain();
-    musicOsc1.type = 'triangle';
-    musicOsc1.frequency.setValueAtTime(55, c.currentTime);
-    musicGain.gain.setValueAtTime(0.04, c.currentTime);
-    musicOsc1.connect(musicGain).connect(c.destination);
-    musicOsc1.start();
+    // Low ambient drone
+    const droneOsc = c.createOscillator();
+    const droneGain = c.createGain();
+    droneOsc.type = 'sine';
+    droneOsc.frequency.setValueAtTime(55, c.currentTime);
+    droneGain.gain.setValueAtTime(0.03, c.currentTime);
+    droneOsc.connect(droneGain).connect(c.destination);
+    droneOsc.start();
+    musicNodes.push({ osc: droneOsc, gain: droneGain });
+
+    // Second drone a fifth up
+    const droneOsc2 = c.createOscillator();
+    const droneGain2 = c.createGain();
+    droneOsc2.type = 'sine';
+    droneOsc2.frequency.setValueAtTime(82, c.currentTime);
+    droneGain2.gain.setValueAtTime(0.02, c.currentTime);
+    droneOsc2.connect(droneGain2).connect(c.destination);
+    droneOsc2.start();
+    musicNodes.push({ osc: droneOsc2, gain: droneGain2 });
+
+    // Melody timer — notes every ~300ms
+    const tempo = 300;
+    musicTimer = setInterval(playMelodyNote, tempo);
     musicPlaying = true;
   } catch {}
 }
 
 function stopMusic() {
-  if (musicOsc1) { try { musicOsc1.stop(); } catch {} musicOsc1 = null; }
-  if (musicGain) { musicGain.disconnect(); musicGain = null; }
+  for (const n of musicNodes) {
+    try { n.osc.stop(); } catch {}
+    try { n.gain.disconnect(); } catch {}
+  }
+  musicNodes = [];
+  if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
   musicPlaying = false;
+  melodyStep = 0;
+  bassStep = 0;
 }
 
 export class AudioSystem extends createSystem({}) {
@@ -119,11 +201,13 @@ export class AudioSystem extends createSystem({}) {
     // Music
     if (gameState.screen === 'playing' && gameState.musicEnabled) {
       if (!musicPlaying) startMusic();
-      if (musicOsc1) {
-        const baseFreq = 55;
-        const wave = gameState.wave;
-        const mod = Math.sin(time * 0.5) * 10 + Math.sin(time * 0.3) * 5;
-        musicOsc1.frequency.setValueAtTime(baseFreq + mod + wave * 2, getCtx().currentTime);
+      // Modulate drone frequency based on wave intensity
+      if (musicNodes.length > 0) {
+        const baseFreq = 55 + gameState.wave * 2;
+        const mod = Math.sin(time * 0.3) * 5;
+        try {
+          musicNodes[0].osc.frequency.setValueAtTime(baseFreq + mod, getCtx().currentTime);
+        } catch {}
       }
     } else if (musicPlaying) {
       stopMusic();

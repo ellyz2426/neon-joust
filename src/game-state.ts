@@ -2,6 +2,7 @@
 export type GameMode = 'arcade' | 'speed' | 'zen' | 'challenge';
 export type Difficulty = 'normal' | 'hard' | 'insane';
 export type EnemyType = 'bounder' | 'hunter' | 'shadow';
+export type PowerUpType = 'shield' | 'speed' | 'magnet' | 'double';
 
 export const COLOR_SCHEMES = [0x00ffff, 0x44ff88, 0xff44aa, 0xffcc00];
 export const COLOR_NAMES = ['CYAN', 'GREEN', 'MAGENTA', 'GOLD'];
@@ -15,6 +16,11 @@ export const MOVE_SPEED = 6;
 export const MAX_VY = 10;
 export const DRAG = 0.97;
 export const LAVA_Y = 0.5;
+
+export const INVINCIBILITY_TIME = 2.5;
+export const POWERUP_DURATION = 8;
+export const POWERUP_DROP_CHANCE = 0.2;
+export const MAGNET_RANGE = 4;
 
 export interface PlatformDef { x: number; y: number; w: number; }
 export const PLATFORMS: PlatformDef[] = [
@@ -34,6 +40,15 @@ export interface EnemyData {
 export interface EggData {
   x: number; y: number; vx: number; vy: number;
   hatchTimer: number; mesh: any; onGround: boolean;
+}
+
+export interface PowerUpData {
+  x: number; y: number; vy: number;
+  type: PowerUpType; mesh: any; age: number;
+}
+
+export interface ScorePopup {
+  x: number; y: number; text: string; life: number; mesh: any;
 }
 
 export interface AchievementDef { id: string; name: string; desc: string; }
@@ -61,6 +76,20 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'five_games', name: 'Regular', desc: 'Play 5 games' },
 ];
 
+export const POWERUP_COLORS: Record<PowerUpType, number> = {
+  shield: 0x4488ff,
+  speed: 0x44ff44,
+  magnet: 0xff44ff,
+  double: 0xffcc00,
+};
+
+export const POWERUP_NAMES: Record<PowerUpType, string> = {
+  shield: 'SHIELD',
+  speed: 'SPEED',
+  magnet: 'MAGNET',
+  double: '2x SCORE',
+};
+
 export const gameState = {
   screen: 'menu' as string,
   mode: 'arcade' as GameMode,
@@ -80,9 +109,12 @@ export const gameState = {
   playerAlive: true,
   playerFlapCooldown: 0,
   respawnTimer: 0,
+  invincibleTimer: 0,
   waveClearTimer: 0,
   waveStarting: false,
   waveTimer: 0,
+  waveTransition: false,
+  waveTransitionTimer: 0,
   pteroActive: false,
   pteroX: 0,
   pteroY: 0,
@@ -98,6 +130,14 @@ export const gameState = {
   soundEnabled: true,
   musicEnabled: true,
   sfxAction: '' as string,
+  colorChanged: false,
+
+  // Power-ups
+  activePowerUp: null as PowerUpType | null,
+  powerUpTimer: 0,
+  shieldActive: false,
+
+  // Stats
   totalGames: 0,
   totalScoreAll: 0,
   bestScore: 0,
@@ -108,10 +148,15 @@ export const gameState = {
   totalWavesAll: 0,
   totalPterosAll: 0,
   totalPlayTime: 0,
+  totalPowerUps: 0,
   achievements: {} as Record<string, boolean>,
 
   get accentColor(): number {
     return COLOR_SCHEMES[this.colorScheme] ?? 0x00ffff;
+  },
+
+  get isInvincible(): boolean {
+    return this.invincibleTimer > 0;
   },
 
   loadStats() {
@@ -129,6 +174,7 @@ export const gameState = {
         this.totalWavesAll = d.totalWavesAll ?? 0;
         this.totalPterosAll = d.totalPterosAll ?? 0;
         this.totalPlayTime = d.totalPlayTime ?? 0;
+        this.totalPowerUps = d.totalPowerUps ?? 0;
         this.achievements = d.achievements ?? {};
         this.soundEnabled = d.soundEnabled ?? true;
         this.musicEnabled = d.musicEnabled ?? true;
@@ -145,6 +191,7 @@ export const gameState = {
         bestCombo: this.bestCombo, totalKillsAll: this.totalKillsAll,
         totalEggsAll: this.totalEggsAll, totalWavesAll: this.totalWavesAll,
         totalPterosAll: this.totalPterosAll, totalPlayTime: this.totalPlayTime,
+        totalPowerUps: this.totalPowerUps,
         achievements: this.achievements, soundEnabled: this.soundEnabled,
         musicEnabled: this.musicEnabled, colorScheme: this.colorScheme,
       }));

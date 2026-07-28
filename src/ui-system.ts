@@ -1,6 +1,6 @@
 // Neon Joust VR — UI system (PanelUI management)
 import { createSystem, World, PanelUI, Follower, ScreenSpace } from '@iwsdk/core';
-import { gameState, ACHIEVEMENTS, COLOR_NAMES, GameMode } from './game-state.js';
+import { gameState, ACHIEVEMENTS, COLOR_NAMES, GameMode, POWERUP_NAMES } from './game-state.js';
 import { GameSystem } from './game-system.js';
 
 type PanelName = 'menu' | 'hud' | 'pause' | 'results' | 'settings' | 'tutorial' | 'stats' | 'achievements';
@@ -48,7 +48,6 @@ export class UISystem extends createSystem({}) {
       this.panels.set(name, panel);
       this.panelEntities.set(name, entity);
       this.wirePanel(name, panel);
-      // Initial visibility
       const vis = screenToPanel(gameState.screen) === name;
       panel.setProperties({ visible: vis });
     });
@@ -147,6 +146,20 @@ export class UISystem extends createSystem({}) {
         this.setText(findEl('txt-timer'), `TIME: ${Math.ceil(gameState.speedTimer)}s`);
       } else {
         this.setText(findEl('txt-timer'), '');
+      }
+      // Power-up indicator
+      if (gameState.activePowerUp) {
+        const name = POWERUP_NAMES[gameState.activePowerUp] ?? '';
+        const secs = Math.ceil(gameState.powerUpTimer);
+        this.setText(findEl('txt-powerup'), `${name} ${secs}s`);
+      } else {
+        this.setText(findEl('txt-powerup'), '');
+      }
+      // Wave announcement
+      if (gameState.waveTransition && gameState.waveTransitionTimer > 1.0) {
+        this.setText(findEl('txt-wave-announce'), `WAVE ${gameState.wave} START!`);
+      } else {
+        this.setText(findEl('txt-wave-announce'), '');
       }
     } else if (panel === 'results') {
       this.setText(findEl('txt-final-score'), `SCORE: ${gameState.score}`);

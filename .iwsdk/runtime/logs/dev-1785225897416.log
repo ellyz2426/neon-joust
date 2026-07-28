@@ -1,0 +1,43 @@
+
+> neon-joust@1.0.0 dev:runtime
+> vite
+
+🚀 Generating initial UIKitML files for dev server...
+👁️  UIKitML file watcher started - monitoring for changes...
+
+  VITE v7.3.6  ready in 1770 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://198.19.0.2:5173/
+
+🔧 IWSDK: Chromium browser not found. Installing (first time only)...
+
+Downloading Chrome for Testing 151.0.7922.34 (playwright chromium v1234) from https://cdn.playwright.dev/builds/cft/151.0.7922.34/linux64/chrome-linux64.zip
+
+🥽 IWSDK Dev Summary (Development):
+  - Device: metaQuest3
+  - Runtime injected: 1120.1KB
+  - Activation mode: localhost
+  - AI: agent mode (WebSocket at /__iwer_mcp)
+  - Note: Runtime only activates on localhost/local networks
+
+
+🥽 IWSDK Dev Summary (Development):
+  - Device: metaQuest3
+  - Runtime injected: 1120.1KB
+  - Activation mode: localhost
+  - AI: agent mode (WebSocket at /__iwer_mcp)
+  - Note: Runtime only activates on localhost/local networks
+
+/home/hatch/workspace/neon-joust/node_modules/playwright/node_modules/playwright-core/lib/coreBundle.js:33313
+              throw new Error(`${err.message} Path: ${lockfilePath}`);
+              ^
+
+Error: ENOENT: no such file or directory, stat '/home/hatch/.cache/ms-playwright/__dirlock' Path: /home/hatch/.cache/ms-playwright/__dirlock
+    at Object.onCompromised (/home/hatch/workspace/neon-joust/node_modules/playwright/node_modules/playwright-core/lib/coreBundle.js:33313:21)
+    at setLockAsCompromised (/home/hatch/workspace/neon-joust/node_modules/playwright/node_modules/playwright-core/lib/coreBundle.js:10425:17)
+    at /home/hatch/workspace/neon-joust/node_modules/playwright/node_modules/playwright-core/lib/coreBundle.js:10383:18
+    at callback (/home/hatch/workspace/neon-joust/node_modules/playwright/node_modules/playwright-core/lib/utilsBundle.js:39023:24)
+    at FSReqCallback.oncomplete (node:fs:198:21)
+
+Node.js v20.19.0

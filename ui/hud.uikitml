@@ -1,7 +1,13 @@
-<panel width="400" height="60" backgroundColor="#000000" backgroundOpacity="0.5" borderRadius="8" flexDirection="row" justifyContent="space-between" alignItems="center" padding="8">
-  <text id="txt-score" content="SCORE: 0" fontSize="16" fontWeight="bold" color="#00ffff"/>
-  <text id="txt-wave" content="WAVE 1" fontSize="16" fontWeight="bold" color="#ffffff"/>
-  <text id="txt-lives" content="LIVES: 3" fontSize="16" fontWeight="bold" color="#44ff44"/>
-  <text id="txt-combo" content="" fontSize="14" fontWeight="bold" color="#ffcc00"/>
-  <text id="txt-timer" content="" fontSize="14" color="#ff8844"/>
+<panel width="420" height="72" backgroundColor="#000000" backgroundOpacity="0.5" borderRadius="8" flexDirection="column" alignItems="center" padding="4">
+  <panel width="400" flexDirection="row" justifyContent="space-between" alignItems="center">
+    <text id="txt-score" content="SCORE: 0" fontSize="16" fontWeight="bold" color="#00ffff"/>
+    <text id="txt-wave" content="WAVE 1" fontSize="16" fontWeight="bold" color="#ffffff"/>
+    <text id="txt-lives" content="LIVES: 3" fontSize="16" fontWeight="bold" color="#44ff44"/>
+    <text id="txt-combo" content="" fontSize="14" fontWeight="bold" color="#ffcc00"/>
+    <text id="txt-timer" content="" fontSize="14" color="#ff8844"/>
+  </panel>
+  <panel width="400" flexDirection="row" justifyContent="center" alignItems="center" gap="8">
+    <text id="txt-powerup" content="" fontSize="12" fontWeight="bold" color="#ff44ff"/>
+    <text id="txt-wave-announce" content="" fontSize="14" fontWeight="bold" color="#ffcc00"/>
+  </panel>
 </panel>
