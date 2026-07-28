@@ -103,6 +103,18 @@ const SFX: Record<string, () => void> = {
     setTimeout(() => playTone(1000, 0.2, 0.12, 'sine'), 500);
     setTimeout(() => playNoise(0.3, 0.1), 100);
   },
+  lava_eruption: () => {
+    playNoise(0.12, 0.1);
+    playTone(100, 0.2, 0.12, 'sawtooth');
+    setTimeout(() => playTone(150, 0.15, 0.1, 'sawtooth'), 80);
+    setTimeout(() => playNoise(0.08, 0.06), 150);
+  },
+  wave_bonus: () => {
+    playTone(500, 0.1, 0.08, 'triangle');
+    setTimeout(() => playTone(600, 0.1, 0.08, 'triangle'), 80);
+    setTimeout(() => playTone(700, 0.12, 0.1, 'triangle'), 160);
+    setTimeout(() => playTone(900, 0.15, 0.1, 'sine'), 240);
+  },
 };
 
 // Melody-driven music system

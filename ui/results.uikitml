@@ -5,6 +5,7 @@
   <text id="txt-final-kills" content="ENEMIES: 0" fontSize="14" color="#44ff44"/>
   <text id="txt-final-eggs" content="EGGS: 0" fontSize="14" color="#ffffff"/>
   <text id="txt-final-combo" content="BEST COMBO: x0" fontSize="14" color="#ffcc00"/>
+  <text id="txt-powerups" content="POWER-UPS: 0" fontSize="14" color="#ff44ff"/>
   <text id="txt-best" content="HIGH SCORE: 0" fontSize="16" fontWeight="bold" color="#ff88cc" marginTop="6"/>
   <panel id="btn-retry" width="240" height="42" backgroundColor="#003344" backgroundOpacity="0.8" borderRadius="8" borderColor="#00ffff" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer" marginTop="8">
     <text content="RETRY" fontSize="18" fontWeight="bold" color="#00ffff"/>

@@ -42,6 +42,12 @@ export interface EnemyData {
 export interface EggData {
   x: number; y: number; vx: number; vy: number;
   hatchTimer: number; mesh: any; onGround: boolean;
+  sourceType: EnemyType;
+}
+
+export interface LavaEruption {
+  x: number; y: number; vy: number;
+  mesh: any; life: number; rising: boolean;
 }
 
 export interface PowerUpData {
@@ -83,6 +89,9 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'five_games', name: 'Regular', desc: 'Play 5 games' },
   { id: 'boss_slayer', name: 'Boss Slayer', desc: 'Defeat a Dragon King' },
   { id: 'boss_master', name: 'Dragon Master', desc: 'Defeat 5 Dragon Kings' },
+  { id: 'lava_dodger', name: 'Lava Dodger', desc: 'Dodge 10 lava eruptions' },
+  { id: 'power_hungry', name: 'Power Hungry', desc: 'Collect 10 power-ups in one game' },
+  { id: 'quick_clear', name: 'Quick Clear', desc: 'Clear a wave in under 10 seconds' },
 ];
 
 export const POWERUP_COLORS: Record<PowerUpType, number> = {
@@ -150,6 +159,16 @@ export const gameState = {
   bossWave: false,
   bossDefeated: 0,
   cameraShake: 0,
+
+  // Lava eruptions
+  lavaEruptionTimer: 0,
+  lavaEruptionsDodged: 0,
+
+  // Wave timing
+  waveStartTime: 0,
+  waveBonusAwarded: false,
+  waveBonus: 0,
+  powerUpsThisGame: 0,
 
   // Stats
   totalGames: 0,
@@ -243,5 +262,7 @@ export const gameState = {
     ck('five_games', this.totalGames >= 5);
     ck('boss_slayer', this.bossDefeated >= 1);
     ck('boss_master', this.bossDefeated >= 5);
+    ck('lava_dodger', this.lavaEruptionsDodged >= 10);
+    ck('power_hungry', this.powerUpsThisGame >= 10);
   },
 };

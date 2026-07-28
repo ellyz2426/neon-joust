@@ -1,5 +1,5 @@
 // Neon Joust VR — UI system (PanelUI management)
-import { createSystem, World, PanelUI, Follower, ScreenSpace } from '@iwsdk/core';
+import { createSystem, World, PanelUI, PanelDocument, UIKit, ScreenSpace } from '@iwsdk/core';
 import { gameState, ACHIEVEMENTS, COLOR_NAMES, GameMode, POWERUP_NAMES } from './game-state.js';
 import { GameSystem } from './game-system.js';
 
@@ -15,6 +15,9 @@ const PANEL_CONFIGS: Record<PanelName, string> = {
   achievements: './ui/achievements.json',
 };
 
+const CONFIG_TO_NAME: Record<string, PanelName> = {};
+for (const [n, c] of Object.entries(PANEL_CONFIGS)) CONFIG_TO_NAME[c] = n as PanelName;
+
 function screenToPanel(screen: string): PanelName {
   if (screen === 'playing') return 'hud';
   if (screen === 'paused') return 'pause';
@@ -22,41 +25,53 @@ function screenToPanel(screen: string): PanelName {
   return screen as PanelName;
 }
 
-export class UISystem extends createSystem({}) {
+export class UISystem extends createSystem({
+  panels: { required: [PanelUI, PanelDocument] },
+}) {
 
-  private panels: Map<PanelName, any> = new Map();
+  private docs: Map<PanelName, any> = new Map();
   private panelEntities: Map<PanelName, any> = new Map();
   private activePanel: PanelName = 'menu';
   private prevScreen = '';
   private achPage = 0;
 
   init() {
+    // Create all panel entities
     for (const [name, config] of Object.entries(PANEL_CONFIGS)) {
-      this.createPanel(name as PanelName, config);
+      const entity = this.world.createEntity();
+      entity.addComponent(PanelUI, { config });
+      if (name === 'hud') {
+        entity.addComponent(ScreenSpace);
+      }
     }
-  }
 
-  private createPanel(name: PanelName, config: string) {
-    const entity = (this.world as any).ecs.createEntity();
-    entity.addComponent(PanelUI, { config });
-    if (name === 'hud') {
-      entity.addComponent(ScreenSpace);
-    }
-    entity.addEventListener('qualify', () => {
-      const panel = entity.getComponent(PanelUI);
-      if (!panel) return;
-      this.panels.set(name, panel);
+    // Listen for qualify events on the panels query
+    this.queries.panels.subscribe('qualify', (entity) => {
+      const config = entity.getValue(PanelUI, 'config') as string;
+      const name = CONFIG_TO_NAME[config];
+      if (!name) return;
+      const doc = PanelDocument.data.document[entity.index] as any;
+      if (!doc) return;
+      this.docs.set(name, doc);
       this.panelEntities.set(name, entity);
-      this.wirePanel(name, panel);
+      this.wirePanel(name, doc);
+      // Show/hide based on current screen
       const vis = screenToPanel(gameState.screen) === name;
-      panel.setProperties({ visible: vis });
+      (doc as any).setProperties?.({ visible: vis });
+      // For non-active panels, hide via root
+      const root = doc.children?.[0];
+      if (root && !vis) {
+        root.setProperties?.({ visibility: 'hidden' });
+      }
     });
   }
 
-  private wirePanel(name: PanelName, panel: any) {
-    const findEl = (id: string) => {
-      try { return panel.querySelector('#' + id); } catch { return null; }
-    };
+  private findEl(doc: any, id: string): any {
+    try { return doc.getElementById(id); } catch { return null; }
+  }
+
+  private wirePanel(name: PanelName, doc: any) {
+    const findEl = (id: string) => this.findEl(doc, id);
 
     if (name === 'menu') {
       this.wireBtn(findEl('btn-arcade'), () => this.startMode('arcade'));
@@ -116,10 +131,18 @@ export class UISystem extends createSystem({}) {
   update(_delta: number, _time: number) {
     const currentPanel = screenToPanel(gameState.screen);
     if (currentPanel !== this.activePanel) {
-      const old = this.panels.get(this.activePanel);
-      if (old) old.setProperties({ visible: false });
-      const cur = this.panels.get(currentPanel);
-      if (cur) cur.setProperties({ visible: true });
+      // Hide old panel
+      const oldDoc = this.docs.get(this.activePanel);
+      if (oldDoc) {
+        const root = oldDoc.children?.[0];
+        if (root) root.setProperties?.({ visibility: 'hidden' });
+      }
+      // Show new panel
+      const curDoc = this.docs.get(currentPanel);
+      if (curDoc) {
+        const root = curDoc.children?.[0];
+        if (root) root.setProperties?.({ visibility: 'visible' });
+      }
       this.activePanel = currentPanel;
     }
     this.updatePanelContent(currentPanel);
@@ -127,11 +150,9 @@ export class UISystem extends createSystem({}) {
   }
 
   private updatePanelContent(panel: PanelName) {
-    const p = this.panels.get(panel);
-    if (!p) return;
-    const findEl = (id: string) => {
-      try { return p.querySelector('#' + id); } catch { return null; }
-    };
+    const doc = this.docs.get(panel);
+    if (!doc) return;
+    const findEl = (id: string) => this.findEl(doc, id);
 
     if (panel === 'hud') {
       this.setText(findEl('txt-score'), `SCORE: ${gameState.score}`);
@@ -157,14 +178,14 @@ export class UISystem extends createSystem({}) {
       }
       // Wave announcement
       if (gameState.waveTransition && gameState.waveTransitionTimer > 1.0) {
-        const bossMsg = gameState.bossWave ? '⚔ BOSS WAVE ⚔' : `WAVE ${gameState.wave} START!`;
-        this.setText(findEl('txt-wave-announce'), bossMsg);
+        const bossMsg = gameState.bossWave ? 'BOSS WAVE' : `WAVE ${gameState.wave} START!`;
+        const bonusMsg = gameState.waveBonus > 0 ? ` +${gameState.waveBonus}` : '';
+        this.setText(findEl('txt-wave-announce'), bossMsg + bonusMsg);
       } else {
         this.setText(findEl('txt-wave-announce'), '');
       }
       // Boss HP indicator
       if (gameState.bossWave) {
-        // Find dragon enemy to show HP
         this.setText(findEl('txt-boss-hp'), this.getBossHpText());
       } else {
         this.setText(findEl('txt-boss-hp'), '');
@@ -176,6 +197,7 @@ export class UISystem extends createSystem({}) {
       this.setText(findEl('txt-final-eggs'), `EGGS: ${gameState.eggsThisGame}`);
       this.setText(findEl('txt-final-combo'), `BEST COMBO: x${gameState.maxCombo}`);
       this.setText(findEl('txt-best'), `HIGH SCORE: ${gameState.bestScore}`);
+      this.setText(findEl('txt-powerups'), `POWER-UPS: ${gameState.powerUpsThisGame}`);
     } else if (panel === 'settings') {
       this.setText(findEl('txt-sound'), `SOUND: ${gameState.soundEnabled ? 'ON' : 'OFF'}`);
       this.setText(findEl('txt-music'), `MUSIC: ${gameState.musicEnabled ? 'ON' : 'OFF'}`);
@@ -192,7 +214,6 @@ export class UISystem extends createSystem({}) {
       this.setText(findEl('txt-best-combo'), `BEST COMBO: x${gameState.bestCombo}`);
     } else if (panel === 'achievements') {
       const start = this.achPage * 5;
-      const end = Math.min(start + 5, ACHIEVEMENTS.length);
       for (let i = 0; i < 5; i++) {
         const a = ACHIEVEMENTS[start + i];
         const el = findEl(`ach-${i}`);
@@ -216,15 +237,15 @@ export class UISystem extends createSystem({}) {
   }
 
   private getBossHpText(): string {
-    // Access game system to find dragon enemies
     try {
       const game = ((this.world as any).getSystem(GameSystem) as GameSystem);
       if (!game) return '';
       const enemies = (game as any).enemies as any[];
       const dragon = enemies?.find((e: any) => e.type === 'dragon' && e.alive);
       if (dragon) {
-        const bars = '█'.repeat(dragon.hp) + '░'.repeat(dragon.maxHp - dragon.hp);
-        return `DRAGON [${bars}]`;
+        const filled = '#'.repeat(dragon.hp);
+        const empty = '-'.repeat(dragon.maxHp - dragon.hp);
+        return `DRAGON [${filled}${empty}]`;
       }
     } catch {}
     return '';

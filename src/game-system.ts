@@ -2,7 +2,7 @@
 import { createSystem, World, Group, Mesh, BoxGeometry, SphereGeometry, CylinderGeometry,
   MeshBasicMaterial, EdgesGeometry, LineSegments, LineBasicMaterial, Color,
   OctahedronGeometry, TorusGeometry } from '@iwsdk/core';
-import { gameState, EnemyData, EggData, PowerUpData, ScorePopup, FireballData, PLATFORMS, GRAVITY, FLAP_IMPULSE,
+import { gameState, EnemyData, EggData, PowerUpData, ScorePopup, FireballData, LavaEruption, PLATFORMS, GRAVITY, FLAP_IMPULSE,
   FLAP_COOLDOWN, MOVE_SPEED, MAX_VY, DRAG, LAVA_Y, ARENA_W, ARENA_H,
   INVINCIBILITY_TIME, POWERUP_DURATION, POWERUP_DROP_CHANCE, MAGNET_RANGE,
   POWERUP_COLORS, PowerUpType } from './game-state.js';
@@ -23,6 +23,10 @@ const FIREBALL_SPEED = 8;
 const FIREBALL_HIT_DIST = 0.8;
 const BOSS_WAVE_INTERVAL = 5;
 const POWERUP_TYPES: PowerUpType[] = ['shield', 'speed', 'magnet', 'double'];
+const LAVA_ERUPTION_INTERVAL = 12;
+const LAVA_ERUPTION_SPEED = 14;
+const LAVA_ERUPTION_HIT_DIST = 0.8;
+const WAVE_QUICK_CLEAR_TIME = 10;
 
 function diffMul(): number {
   return gameState.difficulty === 'insane' ? 1.6 : gameState.difficulty === 'hard' ? 1.3 : 1.0;
@@ -252,6 +256,7 @@ export class GameSystem extends createSystem({}) {
   private powerUps: PowerUpData[] = [];
   private scorePopups: ScorePopup[] = [];
   private fireballs: FireballData[] = [];
+  private lavaEruptions: LavaEruption[] = [];
   private pteroMesh: Group | null = null;
   private platformMeshes: Group[] = [];
   private lavaMesh: Mesh | null = null;
@@ -363,6 +368,11 @@ export class GameSystem extends createSystem({}) {
     gameState.activePowerUp = null;
     gameState.powerUpTimer = 0;
     gameState.shieldActive = false;
+    gameState.lavaEruptionTimer = LAVA_ERUPTION_INTERVAL;
+    gameState.lavaEruptionsDodged = 0;
+    gameState.powerUpsThisGame = 0;
+    gameState.waveStartTime = 0;
+    gameState.waveBonusAwarded = false;
     gameState.lives = mode === 'zen' ? 99 : mode === 'challenge' ? gameState.challengeLives : 3;
     gameState.playerX = 0;
     gameState.playerY = 7;
@@ -383,11 +393,13 @@ export class GameSystem extends createSystem({}) {
     for (const p of this.powerUps) this.world.scene.remove(p.mesh);
     for (const s of this.scorePopups) this.world.scene.remove(s.mesh);
     for (const f of this.fireballs) this.world.scene.remove(f.mesh);
+    for (const l of this.lavaEruptions) this.world.scene.remove(l.mesh);
     this.enemies = [];
     this.eggs = [];
     this.powerUps = [];
     this.scorePopups = [];
     this.fireballs = [];
+    this.lavaEruptions = [];
     if (this.pteroMesh) { this.world.scene.remove(this.pteroMesh); this.pteroMesh = null; }
     gameState.pteroActive = false;
     gameState.bossWave = false;
@@ -398,6 +410,8 @@ export class GameSystem extends createSystem({}) {
     gameState.waveClearTimer = 0;
     gameState.waveTimer = 0;
     gameState.noDeathThisWave = true;
+    gameState.waveStartTime = gameState.gameTime;
+    gameState.waveBonusAwarded = false;
     // Boss wave every BOSS_WAVE_INTERVAL waves
     if (gameState.wave > 1 && gameState.wave % BOSS_WAVE_INTERVAL === 0) {
       gameState.bossWave = true;
@@ -436,11 +450,12 @@ export class GameSystem extends createSystem({}) {
     });
   }
 
-  private spawnEgg(x: number, y: number) {
+  private spawnEgg(x: number, y: number, sourceType?: string) {
     const mesh = createEggMesh();
     mesh.position.set(x, y, 0);
     this.world.scene.add(mesh);
-    this.eggs.push({ x, y, vx: (Math.random() - 0.5) * 2, vy: 1, hatchTimer: HATCH_TIME, mesh, onGround: false });
+    this.eggs.push({ x, y, vx: (Math.random() - 0.5) * 2, vy: 1, hatchTimer: HATCH_TIME, mesh, onGround: false,
+      sourceType: (sourceType ?? 'bounder') as any });
   }
 
   private spawnPowerUp(x: number, y: number) {
@@ -618,11 +633,33 @@ export class GameSystem extends createSystem({}) {
     this.updatePtero(dt);
     // Fireballs
     this.updateFireballs(dt);
+    // Lava eruptions
+    this.updateLavaEruptions(dt, _time);
 
     // Wave check
     if (!gameState.waveStarting && this.enemies.length === 0 && this.eggs.length === 0) {
       gameState.waveClearTimer += dt;
       if (gameState.waveClearTimer >= 1.0) {
+        // Wave clear bonus
+        if (!gameState.waveBonusAwarded) {
+          gameState.waveBonusAwarded = true;
+          const waveDuration = gameState.gameTime - gameState.waveStartTime;
+          let bonus = 200 * gameState.wave; // Base wave bonus
+          if (gameState.noDeathThisWave) {
+            bonus += 500; // No-death bonus
+          }
+          if (waveDuration < WAVE_QUICK_CLEAR_TIME) {
+            bonus += 1000; // Quick clear bonus
+            if (!gameState.achievements['quick_clear']) {
+              gameState.achievements['quick_clear'] = true;
+              gameState.sfxAction = 'achievement';
+              gameState.saveStats();
+            }
+          }
+          this.addScore(bonus);
+          this.spawnScorePopup(gameState.playerX, gameState.playerY + 1.5, bonus, `WAVE BONUS`);
+          gameState.waveBonus = bonus;
+        }
         if (gameState.noDeathThisWave) gameState.noDeathStreak++;
         gameState.totalWavesAll++;
         gameState.wave++;
@@ -844,7 +881,7 @@ export class GameSystem extends createSystem({}) {
     // Fully defeated
     e.alive = false;
     this.world.scene.remove(e.mesh);
-    this.spawnEgg(e.x, e.y);
+    this.spawnEgg(e.x, e.y, e.type === 'dragon' ? 'shadow' : e.type);
     // Power-up drop chance (higher for bosses)
     const dropChance = e.type === 'dragon' ? 1.0 : POWERUP_DROP_CHANCE;
     if (Math.random() < dropChance) {
@@ -897,7 +934,9 @@ export class GameSystem extends createSystem({}) {
     this.powerUps.splice(idx, 1);
     this.activatePowerUp(pu.type);
     gameState.totalPowerUps++;
+    gameState.powerUpsThisGame++;
     gameState.sfxAction = 'powerup';
+    gameState.checkAchievements();
     gameState.saveStats();
   }
 
@@ -985,6 +1024,17 @@ export class GameSystem extends createSystem({}) {
             e.fireTimer = 2.0 + Math.random() * 1.5;
             this.spawnFireball(e.x, e.y, e.facing);
           }
+          // Dragon swooping charge at higher waves
+          if (gameState.wave >= 10) {
+            const dxToPlayer = gameState.playerX - e.x;
+            const dyToPlayer = gameState.playerY - e.y;
+            const distToPlayer = Math.sqrt(dxToPlayer * dxToPlayer + dyToPlayer * dyToPlayer);
+            // Swoop if above player and within horizontal range
+            if (e.y > gameState.playerY + 2 && distToPlayer < 8 && Math.abs(dxToPlayer) < 5) {
+              e.vy -= 15 * dt; // Dive toward player
+              e.vx += (dxToPlayer > 0 ? 1 : -1) * 8 * dt; // Track horizontally
+            }
+          }
         }
       } else {
         if (Math.random() < 0.02) e.vx += (Math.random() - 0.5) * 3;
@@ -1037,14 +1087,16 @@ export class GameSystem extends createSystem({}) {
       if (egg.hatchTimer <= 0) {
         this.world.scene.remove(egg.mesh);
         this.eggs.splice(i, 1);
-        const { group, wingL, wingR } = createBirdMesh(ENEMY_COLORS.hunter);
+        const hatchType = egg.sourceType === 'dragon' ? 'shadow' : egg.sourceType;
+        const { group, wingL, wingR } = createBirdMesh(ENEMY_COLORS[hatchType] ?? 0x44ff44);
         group.position.set(egg.x, egg.y, 0);
         this.world.scene.add(group);
         this.enemies.push({
           x: egg.x, y: egg.y, vx: (Math.random() - 0.5) * 3, vy: 4,
-          type: 'hunter', facing: 1, flapTimer: 0.5,
+          type: hatchType, facing: 1, flapTimer: 0.5,
           mesh: group, wingL, wingR, alive: true,
-          hp: 1, maxHp: 1, hitFlashTimer: 0, fireTimer: 0,
+          hp: ENEMY_HP[hatchType] ?? 1, maxHp: ENEMY_HP[hatchType] ?? 1,
+          hitFlashTimer: 0, fireTimer: 0,
         });
         gameState.sfxAction = 'hatch';
         continue;
@@ -1160,6 +1212,103 @@ export class GameSystem extends createSystem({}) {
           this.world.scene.remove(f.mesh);
           this.fireballs.splice(i, 1);
           gameState.cameraShake = 0.2;
+        }
+      }
+    }
+  }
+
+  private spawnLavaEruption() {
+    const x = (Math.random() - 0.5) * (ARENA_W - 2);
+    const geo = new CylinderGeometry(0.15, 0.3, 0.6, 6);
+    const mat = new MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.85 });
+    const mesh = new Mesh(geo, mat);
+    mesh.position.set(x, LAVA_Y, 0);
+    this.world.scene.add(mesh);
+    // Add glow particles around base
+    const glowGeo = new SphereGeometry(0.2, 6, 4);
+    const glowMat = new MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.5 });
+    const glow = new Mesh(glowGeo, glowMat);
+    mesh.add(glow);
+    this.lavaEruptions.push({ x, y: LAVA_Y, vy: LAVA_ERUPTION_SPEED, mesh, life: 2.5, rising: true });
+    gameState.sfxAction = 'fireball';
+  }
+
+  private updateLavaEruptions(dt: number, time: number) {
+    // Eruption timer — starts at wave 3+
+    if (gameState.wave >= 3 && gameState.playerAlive) {
+      gameState.lavaEruptionTimer -= dt;
+      const interval = Math.max(4, LAVA_ERUPTION_INTERVAL - gameState.wave * 0.5);
+      if (gameState.lavaEruptionTimer <= 0) {
+        gameState.lavaEruptionTimer = interval;
+        this.spawnLavaEruption();
+        // Multiple eruptions at higher waves
+        if (gameState.wave >= 8) {
+          setTimeout(() => this.spawnLavaEruption(), 300);
+        }
+        if (gameState.wave >= 15) {
+          setTimeout(() => this.spawnLavaEruption(), 600);
+        }
+      }
+    }
+
+    for (let i = this.lavaEruptions.length - 1; i >= 0; i--) {
+      const e = this.lavaEruptions[i];
+      e.life -= dt;
+      if (e.rising) {
+        e.y += e.vy * dt;
+        e.vy -= 18 * dt; // Gravity pulls it back
+        if (e.vy <= 0) e.rising = false;
+      } else {
+        e.vy -= 12 * dt;
+        e.y += e.vy * dt;
+      }
+      e.mesh.position.set(e.x, e.y, 0);
+      e.mesh.rotation.y += dt * 6;
+      // Fade as it falls
+      const mat = e.mesh.material as MeshBasicMaterial;
+      mat.opacity = Math.max(0.1, e.life / 2.5 * 0.85);
+      // Scale pulsing
+      const s = 0.8 + Math.sin(time * 12) * 0.2;
+      e.mesh.scale.set(s, 1, s);
+
+      // Remove if expired or below lava
+      if (e.life <= 0 || e.y < LAVA_Y - 0.5) {
+        this.world.scene.remove(e.mesh);
+        this.lavaEruptions.splice(i, 1);
+        continue;
+      }
+
+      // Hit player
+      if (gameState.playerAlive) {
+        const dx = gameState.playerX - e.x;
+        const dy = gameState.playerY - e.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < LAVA_ERUPTION_HIT_DIST) {
+          if (gameState.isInvincible || gameState.shieldActive) {
+            // Dodged / blocked
+            gameState.lavaEruptionsDodged++;
+            gameState.playerVY = 5;
+            gameState.playerVX = dx > 0 ? 3 : -3;
+            if (gameState.shieldActive) {
+              this.deactivatePowerUp();
+              gameState.sfxAction = 'shield_break';
+            }
+            this.world.scene.remove(e.mesh);
+            this.lavaEruptions.splice(i, 1);
+            gameState.cameraShake = 0.15;
+            gameState.checkAchievements();
+          } else {
+            this.playerDeath();
+            this.world.scene.remove(e.mesh);
+            this.lavaEruptions.splice(i, 1);
+            gameState.cameraShake = 0.3;
+          }
+          continue;
+        }
+        // Count as dodged if it passes close but misses
+        if (dist < LAVA_ERUPTION_HIT_DIST * 2.5 && !e.rising && e.vy < -3) {
+          gameState.lavaEruptionsDodged++;
+          gameState.checkAchievements();
         }
       }
     }

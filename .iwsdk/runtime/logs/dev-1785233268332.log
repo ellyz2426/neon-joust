@@ -1,0 +1,34 @@
+
+> neon-joust@1.0.0 dev:runtime
+> vite
+
+🚀 Generating initial UIKitML files for dev server...
+👁️  UIKitML file watcher started - monitoring for changes...
+
+  VITE v7.3.6  ready in 1596 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://198.19.0.2:5173/
+🖥️  IWSDK: Using SwiftShader (software rendering) — no GPU detected
+[browser] TypeError: entity.addEventListener is not a function
+    at UISystem.createPanel (http://localhost:5173/src/ui-system.ts:37:12)
+    at UISystem.init (http://localhost:5173/src/ui-system.ts:28:12)
+    at World2.registerSystem (http://localhost:5173/node_modules/.vite/deps/chunk-GNOTVJWC.js?v=0894ecd1:1312:20)
+    at main (http://localhost:5173/src/index.ts:28:9)
+10:09:34 AM [vite] (client) page reload src/ui-system.ts
+
+🥽 IWSDK Dev Summary (Development):
+  - Device: metaQuest3
+  - Runtime injected: 1120.1KB
+  - Activation mode: localhost
+  - AI: agent mode (WebSocket at /__iwer_mcp)
+  - Note: Runtime only activates on localhost/local networks
+
+
+🥽 IWSDK Dev Summary (Development):
+  - Device: metaQuest3
+  - Runtime injected: 1120.1KB
+  - Activation mode: localhost
+  - AI: agent mode (WebSocket at /__iwer_mcp)
+  - Note: Runtime only activates on localhost/local networks
+
