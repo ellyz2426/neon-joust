@@ -92,6 +92,9 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'lava_dodger', name: 'Lava Dodger', desc: 'Dodge 10 lava eruptions' },
   { id: 'power_hungry', name: 'Power Hungry', desc: 'Collect 10 power-ups in one game' },
   { id: 'quick_clear', name: 'Quick Clear', desc: 'Clear a wave in under 10 seconds' },
+  { id: 'kill_streak3', name: 'Air Ace', desc: '3-kill streak without landing' },
+  { id: 'kill_streak5', name: 'Sky Fury', desc: '5-kill streak without landing' },
+  { id: 'survivor', name: 'Survivor', desc: 'Survive 20 waves in Arcade' },
 ];
 
 export const POWERUP_COLORS: Record<PowerUpType, number> = {
@@ -169,6 +172,15 @@ export const gameState = {
   waveBonusAwarded: false,
   waveBonus: 0,
   powerUpsThisGame: 0,
+
+  // Kill streak (kills without touching ground or platform)
+  killStreak: 0,
+  bestKillStreak: 0,
+  killStreakBonus: 0,
+
+  // Wind gusts
+  windForce: 0,
+  windTimer: 0,
 
   // Stats
   totalGames: 0,
@@ -264,5 +276,8 @@ export const gameState = {
     ck('boss_master', this.bossDefeated >= 5);
     ck('lava_dodger', this.lavaEruptionsDodged >= 10);
     ck('power_hungry', this.powerUpsThisGame >= 10);
+    ck('kill_streak3', this.bestKillStreak >= 3);
+    ck('kill_streak5', this.bestKillStreak >= 5);
+    ck('survivor', this.mode === 'arcade' && this.bestWave >= 20);
   },
 };

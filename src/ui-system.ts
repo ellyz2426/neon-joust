@@ -190,6 +190,19 @@ export class UISystem extends createSystem({
       } else {
         this.setText(findEl('txt-boss-hp'), '');
       }
+      // Kill streak
+      if (gameState.killStreak >= 2) {
+        this.setText(findEl('txt-streak'), `${gameState.killStreak}x AIR STREAK`);
+      } else {
+        this.setText(findEl('txt-streak'), '');
+      }
+      // Wind indicator
+      if (Math.abs(gameState.windForce) > 0.3) {
+        const dir = gameState.windForce > 0 ? '>>>' : '<<<';
+        this.setText(findEl('txt-wind'), `WIND ${dir}`);
+      } else {
+        this.setText(findEl('txt-wind'), '');
+      }
     } else if (panel === 'results') {
       this.setText(findEl('txt-final-score'), `SCORE: ${gameState.score}`);
       this.setText(findEl('txt-final-wave'), `WAVE: ${gameState.wave}`);
@@ -198,6 +211,7 @@ export class UISystem extends createSystem({
       this.setText(findEl('txt-final-combo'), `BEST COMBO: x${gameState.maxCombo}`);
       this.setText(findEl('txt-best'), `HIGH SCORE: ${gameState.bestScore}`);
       this.setText(findEl('txt-powerups'), `POWER-UPS: ${gameState.powerUpsThisGame}`);
+      this.setText(findEl('txt-kill-streak'), `BEST STREAK: ${gameState.bestKillStreak}x`);
     } else if (panel === 'settings') {
       this.setText(findEl('txt-sound'), `SOUND: ${gameState.soundEnabled ? 'ON' : 'OFF'}`);
       this.setText(findEl('txt-music'), `MUSIC: ${gameState.musicEnabled ? 'ON' : 'OFF'}`);

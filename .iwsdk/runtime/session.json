@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "sessionId": "be186960-3acf-426f-9b4f-d7927e2388c7",
+  "workspaceRoot": "/home/hatch/workspace/neon-joust",
+  "pid": 25477,
+  "port": 5173,
+  "localUrl": "http://localhost:5173/",
+  "networkUrls": [
+    "http://198.19.0.2:5173/"
+  ],
+  "aiMode": "agent",
+  "browser": {
+    "status": "connected",
+    "connected": true,
+    "commandReady": true,
+    "connectedClientCount": 1,
+    "lastTransitionAt": "2026-07-28T12:04:35.012Z",
+    "lastBridgeConnectedAt": "2026-07-28T12:04:13.001Z",
+    "lastCommandReadyAt": "2026-07-28T12:04:35.012Z"
+  },
+  "registeredAt": "2026-07-28T12:04:10.984Z",
+  "updatedAt": "2026-07-28T12:04:35.016Z"
+}

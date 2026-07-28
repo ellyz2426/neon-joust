@@ -115,6 +115,11 @@ const SFX: Record<string, () => void> = {
     setTimeout(() => playTone(700, 0.12, 0.1, 'triangle'), 160);
     setTimeout(() => playTone(900, 0.15, 0.1, 'sine'), 240);
   },
+  wind: () => {
+    playNoise(0.4, 0.04);
+    playTone(80, 0.3, 0.03, 'sine');
+    setTimeout(() => playNoise(0.3, 0.03), 150);
+  },
 };
 
 // Melody-driven music system

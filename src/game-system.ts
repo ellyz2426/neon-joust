@@ -373,6 +373,11 @@ export class GameSystem extends createSystem({}) {
     gameState.powerUpsThisGame = 0;
     gameState.waveStartTime = 0;
     gameState.waveBonusAwarded = false;
+    gameState.killStreak = 0;
+    gameState.bestKillStreak = 0;
+    gameState.killStreakBonus = 0;
+    gameState.windForce = 0;
+    gameState.windTimer = 5 + Math.random() * 10;
     gameState.lives = mode === 'zen' ? 99 : mode === 'challenge' ? gameState.challengeLives : 3;
     gameState.playerX = 0;
     gameState.playerY = 7;
@@ -685,6 +690,29 @@ export class GameSystem extends createSystem({}) {
       (this.lavaMesh.material as MeshBasicMaterial).opacity = 0.4 + 0.15 * Math.sin(_time * 5);
     }
 
+    // Wind gusts — push player and enemies periodically at higher waves
+    if (gameState.wave >= 4) {
+      gameState.windTimer -= dt;
+      if (gameState.windTimer <= 0) {
+        gameState.windForce = (Math.random() < 0.5 ? -1 : 1) * (1.5 + Math.random() * 2);
+        gameState.windTimer = 6 + Math.random() * 8;
+        gameState.sfxAction = 'wind';
+      }
+      if (gameState.windForce !== 0) {
+        // Apply wind to player
+        if (gameState.playerAlive && !gameState.playerOnGround) {
+          gameState.playerVX += gameState.windForce * dt * 2;
+        }
+        // Apply wind to enemies
+        for (const e of this.enemies) {
+          if (e.alive) e.vx += gameState.windForce * dt * 1.5;
+        }
+        // Decay wind
+        gameState.windForce *= (1 - dt * 1.5);
+        if (Math.abs(gameState.windForce) < 0.1) gameState.windForce = 0;
+      }
+    }
+
     // Camera shake
     if (gameState.cameraShake > 0) {
       gameState.cameraShake -= dt;
@@ -752,6 +780,18 @@ export class GameSystem extends createSystem({}) {
       gs.playerY = land.py;
       gs.playerVY = 0;
       gs.playerOnGround = true;
+      // Reset kill streak on landing
+      if (gs.killStreak > 0) {
+        if (gs.killStreak >= 3) {
+          // Award streak bonus
+          const streakBonus = gs.killStreak * 150;
+          this.addScore(streakBonus);
+          gs.killStreakBonus = streakBonus;
+          this.spawnScorePopup(gs.playerX, gs.playerY + 1, streakBonus, `${gs.killStreak}x STREAK`);
+          gs.sfxAction = 'wave_bonus';
+        }
+        gs.killStreak = 0;
+      }
     } else {
       gs.playerOnGround = false;
     }
@@ -893,6 +933,8 @@ export class GameSystem extends createSystem({}) {
     }
     this.enemies.splice(idx, 1);
     gameState.combo++;
+    gameState.killStreak++;
+    if (gameState.killStreak > gameState.bestKillStreak) gameState.bestKillStreak = gameState.killStreak;
     if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
     if (gameState.combo > gameState.bestCombo) gameState.bestCombo = gameState.combo;
     gameState.comboTimer = 3;
