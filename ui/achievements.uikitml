@@ -1,0 +1,21 @@
+<panel width="420" height="440" backgroundColor="#000a18" backgroundOpacity="0.95" borderRadius="12" borderColor="#00ffff" borderWidth="2" flexDirection="column" alignItems="center" padding="16" gap="6">
+  <text content="ACHIEVEMENTS" fontSize="28" fontWeight="bold" color="#00ffff" marginBottom="4"/>
+  <text id="txt-total" content="0/20 UNLOCKED" fontSize="13" color="#888888" marginBottom="6"/>
+  <text id="ach-0" content="" fontSize="13" color="#cccccc"/>
+  <text id="ach-1" content="" fontSize="13" color="#cccccc"/>
+  <text id="ach-2" content="" fontSize="13" color="#cccccc"/>
+  <text id="ach-3" content="" fontSize="13" color="#cccccc"/>
+  <text id="ach-4" content="" fontSize="13" color="#cccccc"/>
+  <panel flexDirection="row" gap="10" marginTop="8">
+    <panel id="btn-prev" width="80" height="32" backgroundColor="#002233" backgroundOpacity="0.7" borderRadius="6" borderColor="#00aaaa" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+      <text content="PREV" fontSize="13" color="#00aaaa"/>
+    </panel>
+    <text id="txt-page" content="1/4" fontSize="14" color="#888888"/>
+    <panel id="btn-next" width="80" height="32" backgroundColor="#002233" backgroundOpacity="0.7" borderRadius="6" borderColor="#00aaaa" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+      <text content="NEXT" fontSize="13" color="#00aaaa"/>
+    </panel>
+  </panel>
+  <panel id="btn-back" width="200" height="38" backgroundColor="#003344" backgroundOpacity="0.8" borderRadius="8" borderColor="#00ffff" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer" marginTop="8">
+    <text content="BACK" fontSize="16" fontWeight="bold" color="#00ffff"/>
+  </panel>
+</panel>

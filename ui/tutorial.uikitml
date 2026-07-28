@@ -1,0 +1,24 @@
+<panel width="420" height="440" backgroundColor="#000a18" backgroundOpacity="0.95" borderRadius="12" borderColor="#00ffff" borderWidth="2" flexDirection="column" alignItems="center" padding="16" gap="6">
+  <text content="HOW TO PLAY" fontSize="28" fontWeight="bold" color="#00ffff" marginBottom="6"/>
+  <text content="Flap to fly! Joust enemies from above!" fontSize="14" color="#cccccc"/>
+  <text content="Higher lance wins the joust." fontSize="14" color="#cccccc"/>
+  <text content="" fontSize="8" color="#000000"/>
+  <text content="KEYBOARD:" fontSize="16" fontWeight="bold" color="#44ff88"/>
+  <text content="Arrow/WASD - Move left/right" fontSize="13" color="#aaaaaa"/>
+  <text content="Space/W/Up - Flap (gain altitude)" fontSize="13" color="#aaaaaa"/>
+  <text content="Esc/P - Pause" fontSize="13" color="#aaaaaa"/>
+  <text content="" fontSize="8" color="#000000"/>
+  <text content="VR CONTROLLER:" fontSize="16" fontWeight="bold" color="#44ff88"/>
+  <text content="Thumbstick - Move left/right" fontSize="13" color="#aaaaaa"/>
+  <text content="Trigger/A - Flap" fontSize="13" color="#aaaaaa"/>
+  <text content="B - Pause" fontSize="13" color="#aaaaaa"/>
+  <text content="" fontSize="8" color="#000000"/>
+  <text content="ENEMIES:" fontSize="16" fontWeight="bold" color="#ff4444"/>
+  <text content="Green = Bounder (easy)" fontSize="13" color="#44ff44"/>
+  <text content="Yellow = Hunter (medium)" fontSize="13" color="#ffff44"/>
+  <text content="Red = Shadow Lord (hard)" fontSize="13" color="#ff4444"/>
+  <text content="Collect eggs before they hatch!" fontSize="13" color="#ffffff"/>
+  <panel id="btn-back" width="200" height="38" backgroundColor="#003344" backgroundOpacity="0.8" borderRadius="8" borderColor="#00ffff" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer" marginTop="8">
+    <text content="BACK" fontSize="16" fontWeight="bold" color="#00ffff"/>
+  </panel>
+</panel>

@@ -1,0 +1,32 @@
+<panel width="420" height="520" backgroundColor="#000a18" backgroundOpacity="0.92" borderRadius="12" borderColor="#00ffff" borderWidth="2" flexDirection="column" alignItems="center" padding="16" gap="10">
+  <text id="txt-title" content="NEON JOUST" fontSize="36" fontWeight="bold" color="#00ffff" marginBottom="4"/>
+  <text content="FLAPPING COMBAT ARCADE" fontSize="12" color="#66cccc" marginBottom="12"/>
+  <panel id="btn-arcade" width="280" height="44" backgroundColor="#003344" backgroundOpacity="0.8" borderRadius="8" borderColor="#00ffff" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer" hover:backgroundOpacity="1">
+    <text content="ARCADE" fontSize="18" fontWeight="bold" color="#00ffff"/>
+  </panel>
+  <panel id="btn-speed" width="280" height="44" backgroundColor="#003344" backgroundOpacity="0.8" borderRadius="8" borderColor="#00ffff" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+    <text content="SPEED (120s)" fontSize="18" fontWeight="bold" color="#00ffff"/>
+  </panel>
+  <panel id="btn-zen" width="280" height="44" backgroundColor="#003344" backgroundOpacity="0.8" borderRadius="8" borderColor="#00ffff" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+    <text content="ZEN" fontSize="18" fontWeight="bold" color="#00ffff"/>
+  </panel>
+  <panel id="btn-challenge" width="280" height="44" backgroundColor="#003344" backgroundOpacity="0.8" borderRadius="8" borderColor="#00ffff" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+    <text content="CHALLENGE" fontSize="18" fontWeight="bold" color="#00ffff"/>
+  </panel>
+  <panel flexDirection="row" gap="10" marginTop="10">
+    <panel id="btn-settings" width="130" height="36" backgroundColor="#002233" backgroundOpacity="0.7" borderRadius="6" borderColor="#00aaaa" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+      <text content="SETTINGS" fontSize="14" color="#00aaaa"/>
+    </panel>
+    <panel id="btn-tutorial" width="130" height="36" backgroundColor="#002233" backgroundOpacity="0.7" borderRadius="6" borderColor="#00aaaa" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+      <text content="HOW TO PLAY" fontSize="14" color="#00aaaa"/>
+    </panel>
+  </panel>
+  <panel flexDirection="row" gap="10">
+    <panel id="btn-stats" width="130" height="36" backgroundColor="#002233" backgroundOpacity="0.7" borderRadius="6" borderColor="#00aaaa" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+      <text content="STATS" fontSize="14" color="#00aaaa"/>
+    </panel>
+    <panel id="btn-achievements" width="130" height="36" backgroundColor="#002233" backgroundOpacity="0.7" borderRadius="6" borderColor="#00aaaa" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+      <text content="ACHIEVEMENTS" fontSize="14" color="#00aaaa"/>
+    </panel>
+  </panel>
+</panel>

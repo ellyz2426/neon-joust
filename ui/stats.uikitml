@@ -1,0 +1,14 @@
+<panel width="380" height="420" backgroundColor="#000a18" backgroundOpacity="0.95" borderRadius="12" borderColor="#00ffff" borderWidth="2" flexDirection="column" alignItems="center" padding="16" gap="8">
+  <text content="CAREER STATS" fontSize="28" fontWeight="bold" color="#00ffff" marginBottom="8"/>
+  <text id="txt-games" content="GAMES: 0" fontSize="15" color="#cccccc"/>
+  <text id="txt-kills" content="ENEMIES DEFEATED: 0" fontSize="15" color="#44ff44"/>
+  <text id="txt-eggs" content="EGGS COLLECTED: 0" fontSize="15" color="#ffffff"/>
+  <text id="txt-waves" content="WAVES CLEARED: 0" fontSize="15" color="#cccccc"/>
+  <text id="txt-pteros" content="PTERODACTYLS: 0" fontSize="15" color="#ff8800"/>
+  <text id="txt-best-score" content="BEST SCORE: 0" fontSize="15" fontWeight="bold" color="#ffcc00"/>
+  <text id="txt-best-wave" content="BEST WAVE: 0" fontSize="15" color="#cccccc"/>
+  <text id="txt-best-combo" content="BEST COMBO: x0" fontSize="15" color="#cccccc"/>
+  <panel id="btn-back" width="200" height="38" backgroundColor="#003344" backgroundOpacity="0.8" borderRadius="8" borderColor="#00ffff" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer" marginTop="12">
+    <text content="BACK" fontSize="16" fontWeight="bold" color="#00ffff"/>
+  </panel>
+</panel>
