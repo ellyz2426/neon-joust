@@ -1,9 +1,9 @@
 // Neon Joust VR — UI system (PanelUI management)
 import { createSystem, World, PanelUI, PanelDocument, UIKit, ScreenSpace } from '@iwsdk/core';
-import { gameState, ACHIEVEMENTS, COLOR_NAMES, GameMode, POWERUP_NAMES } from './game-state.js';
+import { gameState, ACHIEVEMENTS, COLOR_NAMES, GameMode, POWERUP_NAMES, LeaderboardEntry, DIFFICULTY_MULTIPLIER } from './game-state.js';
 import { GameSystem } from './game-system.js';
 
-type PanelName = 'menu' | 'hud' | 'pause' | 'results' | 'settings' | 'tutorial' | 'stats' | 'achievements';
+type PanelName = 'menu' | 'hud' | 'pause' | 'results' | 'settings' | 'tutorial' | 'stats' | 'achievements' | 'leaderboard';
 const PANEL_CONFIGS: Record<PanelName, string> = {
   menu: './ui/menu.json',
   hud: './ui/hud.json',
@@ -13,6 +13,7 @@ const PANEL_CONFIGS: Record<PanelName, string> = {
   tutorial: './ui/tutorial.json',
   stats: './ui/stats.json',
   achievements: './ui/achievements.json',
+  leaderboard: './ui/leaderboard.json',
 };
 
 const CONFIG_TO_NAME: Record<string, PanelName> = {};
@@ -82,6 +83,7 @@ export class UISystem extends createSystem({
       this.wireBtn(findEl('btn-tutorial'), () => { gameState.screen = 'tutorial'; });
       this.wireBtn(findEl('btn-stats'), () => { gameState.screen = 'stats'; });
       this.wireBtn(findEl('btn-achievements'), () => { gameState.screen = 'achievements'; });
+      this.wireBtn(findEl('btn-leaderboard'), () => { gameState.screen = 'leaderboard'; });
     } else if (name === 'pause') {
       this.wireBtn(findEl('btn-resume'), () => { gameState.screen = 'playing'; });
       this.wireBtn(findEl('btn-quit'), () => { gameState.screen = 'menu'; });
@@ -115,6 +117,8 @@ export class UISystem extends createSystem({
       this.wireBtn(findEl('btn-back'), () => { gameState.screen = 'menu'; });
       this.wireBtn(findEl('btn-prev'), () => { this.achPage = Math.max(0, this.achPage - 1); });
       this.wireBtn(findEl('btn-next'), () => { this.achPage = Math.min(Math.floor((ACHIEVEMENTS.length - 1) / 5), this.achPage + 1); });
+    } else if (name === 'leaderboard') {
+      this.wireBtn(findEl('btn-back'), () => { gameState.screen = 'menu'; });
     }
   }
 
@@ -209,6 +213,12 @@ export class UISystem extends createSystem({
       } else {
         this.setText(findEl('txt-wave-preview'), '');
       }
+      // Difficulty multiplier
+      if (gameState.diffMultiplier > 1) {
+        this.setText(findEl('txt-diff-mul'), `${gameState.diffMultiplier}x`);
+      } else {
+        this.setText(findEl('txt-diff-mul'), '');
+      }
     } else if (panel === 'results') {
       this.setText(findEl('txt-final-score'), `SCORE: ${gameState.score}`);
       this.setText(findEl('txt-final-wave'), `WAVE: ${gameState.wave}`);
@@ -218,6 +228,19 @@ export class UISystem extends createSystem({
       this.setText(findEl('txt-best'), `HIGH SCORE: ${gameState.bestScore}`);
       this.setText(findEl('txt-powerups'), `POWER-UPS: ${gameState.powerUpsThisGame}`);
       this.setText(findEl('txt-kill-streak'), `BEST STREAK: ${gameState.bestKillStreak}x`);
+      // Leaderboard rank
+      const rank = gameState.leaderboard.findIndex(e => e.score === gameState.score);
+      if (rank >= 0 && rank < 10) {
+        this.setText(findEl('txt-lb-rank'), `#${rank + 1} ON LEADERBOARD!`);
+      } else {
+        this.setText(findEl('txt-lb-rank'), '');
+      }
+      // Difficulty bonus
+      if (gameState.diffMultiplier > 1) {
+        this.setText(findEl('txt-diff-bonus'), `${gameState.difficulty.toUpperCase()} BONUS: ${gameState.diffMultiplier}x SCORE`);
+      } else {
+        this.setText(findEl('txt-diff-bonus'), '');
+      }
     } else if (panel === 'settings') {
       this.setText(findEl('txt-sound'), `SOUND: ${gameState.soundEnabled ? 'ON' : 'OFF'}`);
       this.setText(findEl('txt-music'), `MUSIC: ${gameState.musicEnabled ? 'ON' : 'OFF'}`);
@@ -247,6 +270,21 @@ export class UISystem extends createSystem({
       this.setText(findEl('txt-page'), `${this.achPage + 1}/${Math.ceil(ACHIEVEMENTS.length / 5)}`);
       const unlocked = Object.keys(gameState.achievements).filter(k => gameState.achievements[k]).length;
       this.setText(findEl('txt-total'), `${unlocked}/${ACHIEVEMENTS.length} UNLOCKED`);
+    } else if (panel === 'leaderboard') {
+      const lb = gameState.leaderboard;
+      for (let i = 0; i < 10; i++) {
+        const el = findEl(`lb-${i}`);
+        if (!el) continue;
+        if (i < lb.length) {
+          const e = lb[i];
+          const modeStr = e.mode.toUpperCase().padEnd(8);
+          const diffStr = (e.difficulty ?? 'normal').toUpperCase();
+          this.setText(el, `${(i + 1).toString().padStart(2)}. ${String(e.score).padStart(8)}  W${String(e.wave).padStart(3)}  ${modeStr} ${diffStr}`);
+        } else {
+          this.setText(el, `${(i + 1).toString().padStart(2)}. ---`);
+        }
+      }
+      this.setText(findEl('txt-empty'), lb.length === 0 ? 'No scores yet. Play a game!' : '');
     }
   }
 

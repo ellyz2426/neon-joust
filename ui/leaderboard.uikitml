@@ -1,0 +1,25 @@
+<panel width="420" height="520" backgroundColor="#000a18" backgroundOpacity="0.92" borderRadius="12" borderColor="#ffcc00" borderWidth="2" flexDirection="column" alignItems="center" padding="16" gap="6">
+  <text content="TOP SCORES" fontSize="28" fontWeight="bold" color="#ffcc00" marginBottom="8"/>
+  <panel width="380" flexDirection="row" justifyContent="space-between" padding="4">
+    <text content="#" fontSize="12" fontWeight="bold" color="#888888" width="24"/>
+    <text content="SCORE" fontSize="12" fontWeight="bold" color="#888888" width="100"/>
+    <text content="WAVE" fontSize="12" fontWeight="bold" color="#888888" width="50"/>
+    <text content="MODE" fontSize="12" fontWeight="bold" color="#888888" width="80"/>
+    <text content="DIFF" fontSize="12" fontWeight="bold" color="#888888" width="60"/>
+  </panel>
+  <panel width="380" height="1" backgroundColor="#334455" backgroundOpacity="0.5"/>
+  <text id="lb-0" content="" fontSize="13" color="#00ffff" width="380"/>
+  <text id="lb-1" content="" fontSize="13" color="#00dddd" width="380"/>
+  <text id="lb-2" content="" fontSize="13" color="#00bbbb" width="380"/>
+  <text id="lb-3" content="" fontSize="13" color="#009999" width="380"/>
+  <text id="lb-4" content="" fontSize="13" color="#008888" width="380"/>
+  <text id="lb-5" content="" fontSize="13" color="#007777" width="380"/>
+  <text id="lb-6" content="" fontSize="13" color="#006666" width="380"/>
+  <text id="lb-7" content="" fontSize="13" color="#005555" width="380"/>
+  <text id="lb-8" content="" fontSize="13" color="#004444" width="380"/>
+  <text id="lb-9" content="" fontSize="13" color="#003333" width="380"/>
+  <text id="txt-empty" content="" fontSize="14" color="#556677" marginTop="10"/>
+  <panel id="btn-back" width="280" height="40" backgroundColor="#002233" backgroundOpacity="0.7" borderRadius="8" borderColor="#ffcc00" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer" marginTop="8">
+    <text content="BACK" fontSize="16" fontWeight="bold" color="#ffcc00"/>
+  </panel>
+</panel>

@@ -154,7 +154,21 @@
                   {
                     "sourceTag": "text",
                     "type": "custom",
-                    "children": [],
+                    "children": [
+                      {
+                        "sourceTag": "text",
+                        "type": "custom",
+                        "children": [],
+                        "properties": {
+                          "id": "txt-diff-mul",
+                          "content": "",
+                          "fontsize": "11",
+                          "fontweight": "bold",
+                          "color": "#ffcc00"
+                        },
+                        "dataUid": "uid-16"
+                      }
+                    ],
                     "properties": {
                       "id": "txt-wave-preview",
                       "content": "",
@@ -213,7 +227,7 @@
         "column": 0
       },
       "end": {
-        "line": 18,
+        "line": 19,
         "column": 8
       }
     },
@@ -323,7 +337,7 @@
         "column": 2
       },
       "end": {
-        "line": 17,
+        "line": 18,
         "column": 10
       }
     },
@@ -333,7 +347,7 @@
         "column": 4
       },
       "end": {
-        "line": 17,
+        "line": 18,
         "column": 2
       }
     },
@@ -343,7 +357,7 @@
         "column": 4
       },
       "end": {
-        "line": 17,
+        "line": 18,
         "column": 2
       }
     },
@@ -353,7 +367,17 @@
         "column": 4
       },
       "end": {
+        "line": 18,
+        "column": 2
+      }
+    },
+    "uid-16": {
+      "start": {
         "line": 17,
+        "column": 4
+      },
+      "end": {
+        "line": 18,
         "column": 2
       }
     }

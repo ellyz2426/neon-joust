@@ -5,7 +5,7 @@ import { createSystem, World, Group, Mesh, BoxGeometry, SphereGeometry, Cylinder
 import { gameState, EnemyData, EggData, PowerUpData, ScorePopup, FireballData, LavaEruption, PLATFORMS, GRAVITY, FLAP_IMPULSE,
   FLAP_COOLDOWN, MOVE_SPEED, MAX_VY, DRAG, LAVA_Y, ARENA_W, ARENA_H,
   INVINCIBILITY_TIME, POWERUP_DURATION, POWERUP_DROP_CHANCE, MAGNET_RANGE,
-  POWERUP_COLORS, PowerUpType } from './game-state.js';
+  POWERUP_COLORS, PowerUpType, DIFFICULTY_MULTIPLIER } from './game-state.js';
 
 const HALF_W = ARENA_W / 2;
 const ENEMY_COLORS: Record<string, number> = { bounder: 0x44ff44, hunter: 0xffff44, shadow: 0xff4444, dragon: 0xff6600, charger: 0xff88ff };
@@ -360,6 +360,8 @@ export class GameSystem extends createSystem({}) {
   startGame(mode: string) {
     gameState.screen = 'playing';
     gameState.mode = mode as any;
+    gameState.modesPlayed[mode] = true;
+    gameState.diffMultiplier = DIFFICULTY_MULTIPLIER[gameState.difficulty] ?? 1.0;
     gameState.score = 0;
     gameState.wave = 1;
     gameState.combo = 0;
@@ -727,6 +729,9 @@ export class GameSystem extends createSystem({}) {
       this.spawnPtero();
     }
 
+    // Wave intensity — drives visual atmosphere changes
+    gameState.waveIntensity = Math.min(1.0, gameState.wave / 25);
+
     // Lava animation
     if (this.lavaMesh) {
       this.lavaMesh.position.y = 0.05 * Math.sin(_time * 3);
@@ -1081,7 +1086,8 @@ export class GameSystem extends createSystem({}) {
   }
 
   private addScore(pts: number) {
-    gameState.score += pts;
+    const adjusted = Math.floor(pts * gameState.diffMultiplier);
+    gameState.score += adjusted;
     if (gameState.score > gameState.bestScore) gameState.bestScore = gameState.score;
   }
 
@@ -1089,6 +1095,7 @@ export class GameSystem extends createSystem({}) {
     gameState.screen = 'gameover';
     gameState.totalGames++;
     gameState.totalScoreAll += gameState.score;
+    gameState.addToLeaderboard();
     gameState.checkAchievements();
     gameState.saveStats();
   }

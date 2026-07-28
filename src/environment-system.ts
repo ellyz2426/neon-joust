@@ -1,7 +1,7 @@
-// Neon Joust VR — Holodeck environment
+// Neon Joust VR — Holodeck environment with dynamic wave intensity
 import { createSystem, World, Group, Mesh, BoxGeometry, CylinderGeometry, SphereGeometry,
   MeshBasicMaterial, EdgesGeometry, LineSegments, LineBasicMaterial, AmbientLight, PointLight,
-  FogExp2 } from '@iwsdk/core';
+  FogExp2, Color } from '@iwsdk/core';
 import { gameState, ARENA_W } from './game-state.js';
 
 export class EnvironmentSystem extends createSystem({}) {
@@ -10,22 +10,29 @@ export class EnvironmentSystem extends createSystem({}) {
   private ceilingLights: Mesh[] = [];
   private floorGlow: Mesh | null = null;
   private stars: Mesh[] = [];
+  private ambientLight: AmbientLight | null = null;
+  private accentLight: PointLight | null = null;
+  private lavaLight: PointLight | null = null;
+  private fog: FogExp2 | null = null;
+  private prevIntensity = 0;
 
   init() {
     const scene = this.world.scene;
     const ac = gameState.accentColor;
 
     // Fog
-    scene.fog = new FogExp2(0x000811, 0.02);
+    this.fog = new FogExp2(0x000811, 0.02);
+    scene.fog = this.fog;
 
     // Lighting
-    scene.add(new AmbientLight(0x112233, 0.3));
-    const pl = new PointLight(ac, 0.5, 30);
-    pl.position.set(0, 10, 5);
-    scene.add(pl);
-    const pl2 = new PointLight(0xff4400, 0.3, 20);
-    pl2.position.set(0, 0.5, 3);
-    scene.add(pl2);
+    this.ambientLight = new AmbientLight(0x112233, 0.3);
+    scene.add(this.ambientLight);
+    this.accentLight = new PointLight(ac, 0.5, 30);
+    this.accentLight.position.set(0, 10, 5);
+    scene.add(this.accentLight);
+    this.lavaLight = new PointLight(0xff4400, 0.3, 20);
+    this.lavaLight.position.set(0, 0.5, 3);
+    scene.add(this.lavaLight);
 
     // Grid floor
     const floorGeo = new BoxGeometry(30, 0.02, 20);
@@ -111,6 +118,36 @@ export class EnvironmentSystem extends createSystem({}) {
     for (let i = 0; i < this.stars.length; i++) {
       const mat = this.stars[i].material as MeshBasicMaterial;
       mat.opacity = 0.1 + 0.3 * Math.sin(time * (0.5 + i * 0.1) + i);
+    }
+
+    // Wave intensity atmosphere — fog thickens, lava light brightens, ambient darkens
+    const intensity = gameState.waveIntensity;
+    if (Math.abs(intensity - this.prevIntensity) > 0.01) {
+      this.prevIntensity = intensity;
+      // Fog: denser at high waves (more menacing)
+      if (this.fog) {
+        this.fog.density = 0.02 + intensity * 0.015;
+      }
+      // Lava light: brighter and wider at higher waves
+      if (this.lavaLight) {
+        this.lavaLight.intensity = 0.3 + intensity * 0.5;
+        this.lavaLight.distance = 20 + intensity * 15;
+      }
+      // Ambient: slightly darker at higher waves
+      if (this.ambientLight) {
+        this.ambientLight.intensity = 0.3 - intensity * 0.1;
+      }
+      // Accent light: brighter at higher waves
+      if (this.accentLight) {
+        this.accentLight.intensity = 0.5 + intensity * 0.3;
+      }
+      // Pillar opacity increases with intensity
+      for (const p of this.pillars) {
+        const pillarMesh = p.children[0] as Mesh;
+        if (pillarMesh) {
+          (pillarMesh.material as MeshBasicMaterial).opacity = 0.1 + intensity * 0.08;
+        }
+      }
     }
   }
 }

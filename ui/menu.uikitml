@@ -29,4 +29,7 @@
       <text content="ACHIEVEMENTS" fontSize="14" color="#00aaaa"/>
     </panel>
   </panel>
+  <panel id="btn-leaderboard" width="280" height="36" backgroundColor="#001a22" backgroundOpacity="0.7" borderRadius="6" borderColor="#ffcc00" borderWidth="1" justifyContent="center" alignItems="center" cursor="pointer">
+    <text content="LEADERBOARD" fontSize="14" fontWeight="bold" color="#ffcc00"/>
+  </panel>
 </panel>

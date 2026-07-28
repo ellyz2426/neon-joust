@@ -98,7 +98,21 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'survivor', name: 'Survivor', desc: 'Survive 20 waves in Arcade' },
   { id: 'freezer', name: 'Ice Age', desc: 'Freeze enemies 5 times' },
   { id: 'charger_slayer', name: 'Charger Slayer', desc: 'Defeat 10 chargers' },
+  { id: 'no_powerup_w5', name: 'Purist', desc: 'Reach wave 5 with no power-ups' },
+  { id: 'score250k', name: 'Transcendent', desc: 'Score 250,000 points' },
+  { id: 'all_modes', name: 'Well Rounded', desc: 'Play all 4 game modes' },
+  { id: 'eggs50', name: 'Omelet Chef', desc: 'Collect 50 eggs in one game' },
+  { id: 'wave30', name: 'Endless Knight', desc: 'Reach wave 30' },
 ];
+
+// Leaderboard
+export interface LeaderboardEntry { score: number; wave: number; mode: string; difficulty: string; date: string; }
+
+export const DIFFICULTY_MULTIPLIER: Record<Difficulty, number> = {
+  normal: 1.0,
+  hard: 1.5,
+  insane: 2.0,
+};
 
 export const POWERUP_COLORS: Record<PowerUpType, number> = {
   shield: 0x4488ff,
@@ -195,6 +209,18 @@ export const gameState = {
   // Charger enemies defeated
   chargersDefeated: 0,
 
+  // Modes played (for 'all modes' achievement)
+  modesPlayed: {} as Record<string, boolean>,
+
+  // Leaderboard
+  leaderboard: [] as LeaderboardEntry[],
+
+  // Difficulty multiplier display
+  diffMultiplier: 1.0,
+
+  // Wave intensity (0-1, drives visual atmosphere)
+  waveIntensity: 0,
+
   // Stats
   totalGames: 0,
   totalScoreAll: 0,
@@ -241,6 +267,8 @@ export const gameState = {
         this.soundEnabled = d.soundEnabled ?? true;
         this.musicEnabled = d.musicEnabled ?? true;
         this.colorScheme = d.colorScheme ?? 0;
+        this.leaderboard = d.leaderboard ?? [];
+        this.modesPlayed = d.modesPlayed ?? {};
       }
     } catch {}
   },
@@ -259,8 +287,24 @@ export const gameState = {
         bossDefeated: this.bossDefeated,
         achievements: this.achievements, soundEnabled: this.soundEnabled,
         musicEnabled: this.musicEnabled, colorScheme: this.colorScheme,
+        leaderboard: this.leaderboard,
+        modesPlayed: this.modesPlayed,
       }));
     } catch {}
+  },
+
+  addToLeaderboard() {
+    const entry: LeaderboardEntry = {
+      score: this.score,
+      wave: this.wave,
+      mode: this.mode,
+      difficulty: this.difficulty,
+      date: new Date().toLocaleDateString(),
+    };
+    this.leaderboard.push(entry);
+    this.leaderboard.sort((a, b) => b.score - a.score);
+    if (this.leaderboard.length > 10) this.leaderboard.length = 10;
+    this.saveStats();
   },
 
   checkAchievements() {
@@ -299,5 +343,10 @@ export const gameState = {
     ck('survivor', this.mode === 'arcade' && this.bestWave >= 20);
     ck('freezer', this.totalFreezes >= 5);
     ck('charger_slayer', this.chargersDefeated >= 10);
+    ck('no_powerup_w5', this.wave >= 5 && this.powerUpsThisGame === 0 && this.screen === 'playing');
+    ck('score250k', this.bestScore >= 250000);
+    ck('all_modes', !!(this.modesPlayed['arcade'] && this.modesPlayed['speed'] && this.modesPlayed['zen'] && this.modesPlayed['challenge']));
+    ck('eggs50', this.eggsThisGame >= 50);
+    ck('wave30', this.bestWave >= 30);
   },
 };

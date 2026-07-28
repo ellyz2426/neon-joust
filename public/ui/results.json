@@ -40,77 +40,104 @@
                                         "type": "custom",
                                         "children": [
                                           {
-                                            "sourceTag": "panel",
+                                            "sourceTag": "text",
                                             "type": "custom",
                                             "children": [
                                               {
                                                 "sourceTag": "text",
                                                 "type": "custom",
-                                                "children": [],
+                                                "children": [
+                                                  {
+                                                    "sourceTag": "panel",
+                                                    "type": "custom",
+                                                    "children": [
+                                                      {
+                                                        "sourceTag": "text",
+                                                        "type": "custom",
+                                                        "children": [],
+                                                        "properties": {
+                                                          "content": "RETRY",
+                                                          "fontsize": "18",
+                                                          "fontweight": "bold",
+                                                          "color": "#00ffff"
+                                                        },
+                                                        "dataUid": "uid-14"
+                                                      }
+                                                    ],
+                                                    "properties": {
+                                                      "id": "btn-retry",
+                                                      "width": "240",
+                                                      "height": "42",
+                                                      "backgroundcolor": "#003344",
+                                                      "backgroundopacity": "0.8",
+                                                      "borderradius": "8",
+                                                      "bordercolor": "#00ffff",
+                                                      "borderwidth": "1",
+                                                      "justifycontent": "center",
+                                                      "alignitems": "center",
+                                                      "cursor": "pointer",
+                                                      "margintop": "8"
+                                                    },
+                                                    "dataUid": "uid-13"
+                                                  },
+                                                  {
+                                                    "sourceTag": "panel",
+                                                    "type": "custom",
+                                                    "children": [
+                                                      {
+                                                        "sourceTag": "text",
+                                                        "type": "custom",
+                                                        "children": [],
+                                                        "properties": {
+                                                          "content": "MENU",
+                                                          "fontsize": "18",
+                                                          "color": "#00aaaa"
+                                                        },
+                                                        "dataUid": "uid-16"
+                                                      }
+                                                    ],
+                                                    "properties": {
+                                                      "id": "btn-menu",
+                                                      "width": "240",
+                                                      "height": "42",
+                                                      "backgroundcolor": "#002233",
+                                                      "backgroundopacity": "0.7",
+                                                      "borderradius": "8",
+                                                      "bordercolor": "#00aaaa",
+                                                      "borderwidth": "1",
+                                                      "justifycontent": "center",
+                                                      "alignitems": "center",
+                                                      "cursor": "pointer"
+                                                    },
+                                                    "dataUid": "uid-15"
+                                                  }
+                                                ],
                                                 "properties": {
-                                                  "content": "RETRY",
-                                                  "fontsize": "18",
+                                                  "id": "txt-best",
+                                                  "content": "HIGH SCORE: 0",
+                                                  "fontsize": "16",
                                                   "fontweight": "bold",
-                                                  "color": "#00ffff"
+                                                  "color": "#ff88cc",
+                                                  "margintop": "4"
                                                 },
                                                 "dataUid": "uid-12"
                                               }
                                             ],
                                             "properties": {
-                                              "id": "btn-retry",
-                                              "width": "240",
-                                              "height": "42",
-                                              "backgroundcolor": "#003344",
-                                              "backgroundopacity": "0.8",
-                                              "borderradius": "8",
-                                              "bordercolor": "#00ffff",
-                                              "borderwidth": "1",
-                                              "justifycontent": "center",
-                                              "alignitems": "center",
-                                              "cursor": "pointer",
-                                              "margintop": "8"
+                                              "id": "txt-diff-bonus",
+                                              "content": "",
+                                              "fontsize": "12",
+                                              "color": "#ff88cc"
                                             },
                                             "dataUid": "uid-11"
-                                          },
-                                          {
-                                            "sourceTag": "panel",
-                                            "type": "custom",
-                                            "children": [
-                                              {
-                                                "sourceTag": "text",
-                                                "type": "custom",
-                                                "children": [],
-                                                "properties": {
-                                                  "content": "MENU",
-                                                  "fontsize": "18",
-                                                  "color": "#00aaaa"
-                                                },
-                                                "dataUid": "uid-14"
-                                              }
-                                            ],
-                                            "properties": {
-                                              "id": "btn-menu",
-                                              "width": "240",
-                                              "height": "42",
-                                              "backgroundcolor": "#002233",
-                                              "backgroundopacity": "0.7",
-                                              "borderradius": "8",
-                                              "bordercolor": "#00aaaa",
-                                              "borderwidth": "1",
-                                              "justifycontent": "center",
-                                              "alignitems": "center",
-                                              "cursor": "pointer"
-                                            },
-                                            "dataUid": "uid-13"
                                           }
                                         ],
                                         "properties": {
-                                          "id": "txt-best",
-                                          "content": "HIGH SCORE: 0",
-                                          "fontsize": "16",
+                                          "id": "txt-lb-rank",
+                                          "content": "",
+                                          "fontsize": "14",
                                           "fontweight": "bold",
-                                          "color": "#ff88cc",
-                                          "margintop": "6"
+                                          "color": "#ffcc00"
                                         },
                                         "dataUid": "uid-10"
                                       }
@@ -212,7 +239,7 @@
         "column": 0
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 8
       }
     },
@@ -222,7 +249,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -232,7 +259,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -242,7 +269,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -252,7 +279,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -262,7 +289,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -272,7 +299,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -282,7 +309,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -292,7 +319,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -302,7 +329,7 @@
         "column": 2
       },
       "end": {
-        "line": 16,
+        "line": 18,
         "column": 0
       }
     },
@@ -312,37 +339,57 @@
         "column": 2
       },
       "end": {
-        "line": 12,
-        "column": 10
+        "line": 18,
+        "column": 0
       }
     },
     "uid-12": {
       "start": {
         "line": 11,
-        "column": 4
+        "column": 2
       },
       "end": {
-        "line": 12,
-        "column": 2
+        "line": 18,
+        "column": 0
       }
     },
     "uid-13": {
       "start": {
-        "line": 13,
+        "line": 12,
         "column": 2
       },
       "end": {
-        "line": 15,
+        "line": 14,
         "column": 10
       }
     },
     "uid-14": {
       "start": {
-        "line": 14,
+        "line": 13,
         "column": 4
       },
       "end": {
+        "line": 14,
+        "column": 2
+      }
+    },
+    "uid-15": {
+      "start": {
         "line": 15,
+        "column": 2
+      },
+      "end": {
+        "line": 17,
+        "column": 10
+      }
+    },
+    "uid-16": {
+      "start": {
+        "line": 16,
+        "column": 4
+      },
+      "end": {
+        "line": 17,
         "column": 2
       }
     }

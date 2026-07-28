@@ -286,6 +286,38 @@
                   "gap": "10"
                 },
                 "dataUid": "uid-17"
+              },
+              {
+                "sourceTag": "panel",
+                "type": "custom",
+                "children": [
+                  {
+                    "sourceTag": "text",
+                    "type": "custom",
+                    "children": [],
+                    "properties": {
+                      "content": "LEADERBOARD",
+                      "fontsize": "14",
+                      "fontweight": "bold",
+                      "color": "#ffcc00"
+                    },
+                    "dataUid": "uid-23"
+                  }
+                ],
+                "properties": {
+                  "id": "btn-leaderboard",
+                  "width": "280",
+                  "height": "36",
+                  "backgroundcolor": "#001a22",
+                  "backgroundopacity": "0.7",
+                  "borderradius": "6",
+                  "bordercolor": "#ffcc00",
+                  "borderwidth": "1",
+                  "justifycontent": "center",
+                  "alignitems": "center",
+                  "cursor": "pointer"
+                },
+                "dataUid": "uid-22"
               }
             ],
             "properties": {
@@ -331,7 +363,7 @@
         "column": 0
       },
       "end": {
-        "line": 31,
+        "line": 34,
         "column": 8
       }
     },
@@ -341,7 +373,7 @@
         "column": 2
       },
       "end": {
-        "line": 31,
+        "line": 34,
         "column": 0
       }
     },
@@ -351,7 +383,7 @@
         "column": 2
       },
       "end": {
-        "line": 31,
+        "line": 34,
         "column": 0
       }
     },
@@ -533,6 +565,26 @@
       "end": {
         "line": 29,
         "column": 4
+      }
+    },
+    "uid-22": {
+      "start": {
+        "line": 31,
+        "column": 2
+      },
+      "end": {
+        "line": 33,
+        "column": 10
+      }
+    },
+    "uid-23": {
+      "start": {
+        "line": 32,
+        "column": 4
+      },
+      "end": {
+        "line": 33,
+        "column": 2
       }
     }
   }

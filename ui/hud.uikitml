@@ -15,5 +15,6 @@
     <text id="txt-streak" content="" fontSize="11" fontWeight="bold" color="#ff8844"/>
     <text id="txt-wind" content="" fontSize="11" color="#88ccff"/>
     <text id="txt-wave-preview" content="" fontSize="10" color="#aaddff"/>
+    <text id="txt-diff-mul" content="" fontSize="11" fontWeight="bold" color="#ffcc00"/>
   </panel>
 </panel>
