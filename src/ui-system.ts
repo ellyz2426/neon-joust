@@ -157,9 +157,17 @@ export class UISystem extends createSystem({}) {
       }
       // Wave announcement
       if (gameState.waveTransition && gameState.waveTransitionTimer > 1.0) {
-        this.setText(findEl('txt-wave-announce'), `WAVE ${gameState.wave} START!`);
+        const bossMsg = gameState.bossWave ? '⚔ BOSS WAVE ⚔' : `WAVE ${gameState.wave} START!`;
+        this.setText(findEl('txt-wave-announce'), bossMsg);
       } else {
         this.setText(findEl('txt-wave-announce'), '');
+      }
+      // Boss HP indicator
+      if (gameState.bossWave) {
+        // Find dragon enemy to show HP
+        this.setText(findEl('txt-boss-hp'), this.getBossHpText());
+      } else {
+        this.setText(findEl('txt-boss-hp'), '');
       }
     } else if (panel === 'results') {
       this.setText(findEl('txt-final-score'), `SCORE: ${gameState.score}`);
@@ -205,5 +213,20 @@ export class UISystem extends createSystem({}) {
     if (el) {
       try { el.setProperties({ content: text }); } catch {}
     }
+  }
+
+  private getBossHpText(): string {
+    // Access game system to find dragon enemies
+    try {
+      const game = ((this.world as any).getSystem(GameSystem) as GameSystem);
+      if (!game) return '';
+      const enemies = (game as any).enemies as any[];
+      const dragon = enemies?.find((e: any) => e.type === 'dragon' && e.alive);
+      if (dragon) {
+        const bars = '█'.repeat(dragon.hp) + '░'.repeat(dragon.maxHp - dragon.hp);
+        return `DRAGON [${bars}]`;
+      }
+    } catch {}
+    return '';
   }
 }

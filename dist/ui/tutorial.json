@@ -80,156 +80,181 @@
                                                                                 "type": "custom",
                                                                                 "children": [
                                                                                   {
-                                                                                    "sourceTag": "panel",
+                                                                                    "sourceTag": "text",
                                                                                     "type": "custom",
                                                                                     "children": [
                                                                                       {
                                                                                         "sourceTag": "text",
                                                                                         "type": "custom",
-                                                                                        "children": [],
+                                                                                        "children": [
+                                                                                          {
+                                                                                            "sourceTag": "panel",
+                                                                                            "type": "custom",
+                                                                                            "children": [
+                                                                                              {
+                                                                                                "sourceTag": "text",
+                                                                                                "type": "custom",
+                                                                                                "children": [],
+                                                                                                "properties": {
+                                                                                                  "content": "BACK",
+                                                                                                  "fontsize": "15",
+                                                                                                  "fontweight": "bold",
+                                                                                                  "color": "#00ffff"
+                                                                                                },
+                                                                                                "dataUid": "uid-24"
+                                                                                              }
+                                                                                            ],
+                                                                                            "properties": {
+                                                                                              "id": "btn-back",
+                                                                                              "width": "180",
+                                                                                              "height": "34",
+                                                                                              "backgroundcolor": "#003344",
+                                                                                              "backgroundopacity": "0.8",
+                                                                                              "borderradius": "8",
+                                                                                              "bordercolor": "#00ffff",
+                                                                                              "borderwidth": "1",
+                                                                                              "justifycontent": "center",
+                                                                                              "alignitems": "center",
+                                                                                              "cursor": "pointer",
+                                                                                              "margintop": "6"
+                                                                                            },
+                                                                                            "dataUid": "uid-23"
+                                                                                          }
+                                                                                        ],
                                                                                         "properties": {
-                                                                                          "content": "BACK",
-                                                                                          "fontsize": "16",
-                                                                                          "fontweight": "bold",
-                                                                                          "color": "#00ffff"
+                                                                                          "content": "Arcade=Classic | Speed=120s | Zen=Inf | Challenge=5HP",
+                                                                                          "fontsize": "12",
+                                                                                          "color": "#aaaaaa"
                                                                                         },
                                                                                         "dataUid": "uid-22"
                                                                                       }
                                                                                     ],
                                                                                     "properties": {
-                                                                                      "id": "btn-back",
-                                                                                      "width": "200",
-                                                                                      "height": "38",
-                                                                                      "backgroundcolor": "#003344",
-                                                                                      "backgroundopacity": "0.8",
-                                                                                      "borderradius": "8",
-                                                                                      "bordercolor": "#00ffff",
-                                                                                      "borderwidth": "1",
-                                                                                      "justifycontent": "center",
-                                                                                      "alignitems": "center",
-                                                                                      "cursor": "pointer",
-                                                                                      "margintop": "8"
+                                                                                      "content": "MODES:",
+                                                                                      "fontsize": "15",
+                                                                                      "fontweight": "bold",
+                                                                                      "color": "#00aaaa"
                                                                                     },
                                                                                     "dataUid": "uid-21"
                                                                                   }
                                                                                 ],
                                                                                 "properties": {
-                                                                                  "content": "Collect eggs before they hatch!",
-                                                                                  "fontsize": "13",
-                                                                                  "color": "#ffffff"
+                                                                                  "content": "",
+                                                                                  "fontsize": "4",
+                                                                                  "color": "#000000"
                                                                                 },
                                                                                 "dataUid": "uid-20"
                                                                               }
                                                                             ],
                                                                             "properties": {
-                                                                              "content": "Red = Shadow Lord (hard)",
-                                                                              "fontsize": "13",
-                                                                              "color": "#ff4444"
+                                                                              "content": "Gold 2x Score - Doubles all points",
+                                                                              "fontsize": "12",
+                                                                              "color": "#ffcc00"
                                                                             },
                                                                             "dataUid": "uid-19"
                                                                           }
                                                                         ],
                                                                         "properties": {
-                                                                          "content": "Yellow = Hunter (medium)",
-                                                                          "fontsize": "13",
-                                                                          "color": "#ffff44"
+                                                                          "content": "Pink Magnet - Attracts nearby eggs",
+                                                                          "fontsize": "12",
+                                                                          "color": "#ff44ff"
                                                                         },
                                                                         "dataUid": "uid-18"
                                                                       }
                                                                     ],
                                                                     "properties": {
-                                                                      "content": "Green = Bounder (easy)",
-                                                                      "fontsize": "13",
+                                                                      "content": "Green Speed - Faster movement + flap",
+                                                                      "fontsize": "12",
                                                                       "color": "#44ff44"
                                                                     },
                                                                     "dataUid": "uid-17"
                                                                   }
                                                                 ],
                                                                 "properties": {
-                                                                  "content": "ENEMIES:",
-                                                                  "fontsize": "16",
-                                                                  "fontweight": "bold",
-                                                                  "color": "#ff4444"
+                                                                  "content": "Blue Shield - Blocks one hit + lava",
+                                                                  "fontsize": "12",
+                                                                  "color": "#4488ff"
                                                                 },
                                                                 "dataUid": "uid-16"
                                                               }
                                                             ],
                                                             "properties": {
-                                                              "content": "",
-                                                              "fontsize": "8",
-                                                              "color": "#000000"
+                                                              "content": "POWER-UPS:",
+                                                              "fontsize": "15",
+                                                              "fontweight": "bold",
+                                                              "color": "#ff44ff"
                                                             },
                                                             "dataUid": "uid-15"
                                                           }
                                                         ],
                                                         "properties": {
-                                                          "content": "B - Pause",
-                                                          "fontsize": "13",
-                                                          "color": "#aaaaaa"
+                                                          "content": "",
+                                                          "fontsize": "4",
+                                                          "color": "#000000"
                                                         },
                                                         "dataUid": "uid-14"
                                                       }
                                                     ],
                                                     "properties": {
-                                                      "content": "Trigger/A - Flap",
-                                                      "fontsize": "13",
+                                                      "content": "Boss every 5 waves. Collect eggs before hatch!",
+                                                      "fontsize": "12",
                                                       "color": "#aaaaaa"
                                                     },
                                                     "dataUid": "uid-13"
                                                   }
                                                 ],
                                                 "properties": {
-                                                  "content": "Thumbstick - Move left/right",
-                                                  "fontsize": "13",
-                                                  "color": "#aaaaaa"
+                                                  "content": "Orange=Dragon King (BOSS, 5+HP, shoots fire!)",
+                                                  "fontsize": "12",
+                                                  "color": "#ff6600"
                                                 },
                                                 "dataUid": "uid-12"
                                               }
                                             ],
                                             "properties": {
-                                              "content": "VR CONTROLLER:",
-                                              "fontsize": "16",
-                                              "fontweight": "bold",
-                                              "color": "#44ff88"
+                                              "content": "Green=Bounder | Yellow=Hunter | Red=Shadow(2HP)",
+                                              "fontsize": "12",
+                                              "color": "#aaaaaa"
                                             },
                                             "dataUid": "uid-11"
                                           }
                                         ],
                                         "properties": {
-                                          "content": "",
-                                          "fontsize": "8",
-                                          "color": "#000000"
+                                          "content": "ENEMIES:",
+                                          "fontsize": "15",
+                                          "fontweight": "bold",
+                                          "color": "#ff4444"
                                         },
                                         "dataUid": "uid-10"
                                       }
                                     ],
                                     "properties": {
-                                      "content": "Esc/P - Pause",
-                                      "fontsize": "13",
-                                      "color": "#aaaaaa"
+                                      "content": "",
+                                      "fontsize": "4",
+                                      "color": "#000000"
                                     },
                                     "dataUid": "uid-9"
                                   }
                                 ],
                                 "properties": {
-                                  "content": "Space/W/Up - Flap (gain altitude)",
-                                  "fontsize": "13",
+                                  "content": "VR: Thumbstick - Move | Trigger/A - Flap",
+                                  "fontsize": "12",
                                   "color": "#aaaaaa"
                                 },
                                 "dataUid": "uid-8"
                               }
                             ],
                             "properties": {
-                              "content": "Arrow/WASD - Move left/right",
-                              "fontsize": "13",
+                              "content": "Arrows/WASD - Move | Space/W/Up - Flap",
+                              "fontsize": "12",
                               "color": "#aaaaaa"
                             },
                             "dataUid": "uid-7"
                           }
                         ],
                         "properties": {
-                          "content": "KEYBOARD:",
-                          "fontsize": "16",
+                          "content": "CONTROLS:",
+                          "fontsize": "15",
                           "fontweight": "bold",
                           "color": "#44ff88"
                         },
@@ -238,7 +263,7 @@
                     ],
                     "properties": {
                       "content": "",
-                      "fontsize": "8",
+                      "fontsize": "4",
                       "color": "#000000"
                     },
                     "dataUid": "uid-5"
@@ -246,7 +271,7 @@
                 ],
                 "properties": {
                   "content": "Higher lance wins the joust.",
-                  "fontsize": "14",
+                  "fontsize": "13",
                   "color": "#cccccc"
                 },
                 "dataUid": "uid-4"
@@ -254,7 +279,7 @@
             ],
             "properties": {
               "content": "Flap to fly! Joust enemies from above!",
-              "fontsize": "14",
+              "fontsize": "13",
               "color": "#cccccc"
             },
             "dataUid": "uid-3"
@@ -262,17 +287,17 @@
         ],
         "properties": {
           "content": "HOW TO PLAY",
-          "fontsize": "28",
+          "fontsize": "26",
           "fontweight": "bold",
           "color": "#00ffff",
-          "marginbottom": "6"
+          "marginbottom": "4"
         },
         "dataUid": "uid-2"
       }
     ],
     "properties": {
-      "width": "420",
-      "height": "440",
+      "width": "440",
+      "height": "560",
       "backgroundcolor": "#000a18",
       "backgroundopacity": "0.95",
       "borderradius": "12",
@@ -280,8 +305,8 @@
       "borderwidth": "2",
       "flexdirection": "column",
       "alignitems": "center",
-      "padding": "16",
-      "gap": "6"
+      "padding": "14",
+      "gap": "4"
     },
     "dataUid": "uid-1"
   },
@@ -293,7 +318,7 @@
         "column": 0
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 8
       }
     },
@@ -303,7 +328,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -313,7 +338,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -323,7 +348,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -333,7 +358,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -343,7 +368,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -353,7 +378,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -363,7 +388,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -373,7 +398,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -383,7 +408,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -393,7 +418,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -403,7 +428,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -413,7 +438,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -423,7 +448,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -433,7 +458,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -443,7 +468,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -453,7 +478,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -463,7 +488,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -473,7 +498,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -483,7 +508,7 @@
         "column": 2
       },
       "end": {
-        "line": 23,
+        "line": 25,
         "column": 0
       }
     },
@@ -493,17 +518,37 @@
         "column": 2
       },
       "end": {
-        "line": 22,
-        "column": 10
+        "line": 25,
+        "column": 0
       }
     },
     "uid-22": {
       "start": {
         "line": 21,
+        "column": 2
+      },
+      "end": {
+        "line": 25,
+        "column": 0
+      }
+    },
+    "uid-23": {
+      "start": {
+        "line": 22,
+        "column": 2
+      },
+      "end": {
+        "line": 24,
+        "column": 10
+      }
+    },
+    "uid-24": {
+      "start": {
+        "line": 23,
         "column": 4
       },
       "end": {
-        "line": 22,
+        "line": 24,
         "column": 2
       }
     }

@@ -1,7 +1,7 @@
 // Neon Joust VR — Shared game state
 export type GameMode = 'arcade' | 'speed' | 'zen' | 'challenge';
 export type Difficulty = 'normal' | 'hard' | 'insane';
-export type EnemyType = 'bounder' | 'hunter' | 'shadow';
+export type EnemyType = 'bounder' | 'hunter' | 'shadow' | 'dragon';
 export type PowerUpType = 'shield' | 'speed' | 'magnet' | 'double';
 
 export const COLOR_SCHEMES = [0x00ffff, 0x44ff88, 0xff44aa, 0xffcc00];
@@ -35,6 +35,8 @@ export interface EnemyData {
   x: number; y: number; vx: number; vy: number;
   type: EnemyType; facing: number; flapTimer: number;
   mesh: any; wingL: any; wingR: any; alive: boolean;
+  hp: number; maxHp: number; hitFlashTimer: number;
+  fireTimer: number;
 }
 
 export interface EggData {
@@ -49,6 +51,11 @@ export interface PowerUpData {
 
 export interface ScorePopup {
   x: number; y: number; text: string; life: number; mesh: any;
+}
+
+export interface FireballData {
+  x: number; y: number; vx: number; vy: number;
+  mesh: any; life: number;
 }
 
 export interface AchievementDef { id: string; name: string; desc: string; }
@@ -74,6 +81,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: 'speed_win', name: 'Speed Demon', desc: 'Survive Speed mode' },
   { id: 'marathon', name: 'Marathon', desc: 'Play for 10 minutes' },
   { id: 'five_games', name: 'Regular', desc: 'Play 5 games' },
+  { id: 'boss_slayer', name: 'Boss Slayer', desc: 'Defeat a Dragon King' },
+  { id: 'boss_master', name: 'Dragon Master', desc: 'Defeat 5 Dragon Kings' },
 ];
 
 export const POWERUP_COLORS: Record<PowerUpType, number> = {
@@ -137,6 +146,11 @@ export const gameState = {
   powerUpTimer: 0,
   shieldActive: false,
 
+  // Boss
+  bossWave: false,
+  bossDefeated: 0,
+  cameraShake: 0,
+
   // Stats
   totalGames: 0,
   totalScoreAll: 0,
@@ -175,6 +189,7 @@ export const gameState = {
         this.totalPterosAll = d.totalPterosAll ?? 0;
         this.totalPlayTime = d.totalPlayTime ?? 0;
         this.totalPowerUps = d.totalPowerUps ?? 0;
+        this.bossDefeated = d.bossDefeated ?? 0;
         this.achievements = d.achievements ?? {};
         this.soundEnabled = d.soundEnabled ?? true;
         this.musicEnabled = d.musicEnabled ?? true;
@@ -192,6 +207,7 @@ export const gameState = {
         totalEggsAll: this.totalEggsAll, totalWavesAll: this.totalWavesAll,
         totalPterosAll: this.totalPterosAll, totalPlayTime: this.totalPlayTime,
         totalPowerUps: this.totalPowerUps,
+        bossDefeated: this.bossDefeated,
         achievements: this.achievements, soundEnabled: this.soundEnabled,
         musicEnabled: this.musicEnabled, colorScheme: this.colorScheme,
       }));
@@ -225,5 +241,7 @@ export const gameState = {
     ck('untouchable', this.noDeathStreak >= 5);
     ck('marathon', this.totalPlayTime >= 600);
     ck('five_games', this.totalGames >= 5);
+    ck('boss_slayer', this.bossDefeated >= 1);
+    ck('boss_master', this.bossDefeated >= 5);
   },
 };

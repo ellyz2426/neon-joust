@@ -89,6 +89,20 @@ const SFX: Record<string, () => void> = {
     playTone(300, 0.15, 0.1, 'sawtooth');
     setTimeout(() => playTone(200, 0.1, 0.08, 'sawtooth'), 100);
   },
+  fireball: () => {
+    playNoise(0.08, 0.06);
+    playTone(180, 0.15, 0.1, 'sawtooth');
+    setTimeout(() => playTone(120, 0.1, 0.08, 'sawtooth'), 60);
+  },
+  boss_defeat: () => {
+    playTone(300, 0.15, 0.12, 'square');
+    setTimeout(() => playTone(400, 0.12, 0.12, 'square'), 100);
+    setTimeout(() => playTone(500, 0.12, 0.12, 'square'), 200);
+    setTimeout(() => playTone(600, 0.12, 0.12, 'square'), 300);
+    setTimeout(() => playTone(800, 0.15, 0.14, 'square'), 400);
+    setTimeout(() => playTone(1000, 0.2, 0.12, 'sine'), 500);
+    setTimeout(() => playNoise(0.3, 0.1), 100);
+  },
 };
 
 // Melody-driven music system

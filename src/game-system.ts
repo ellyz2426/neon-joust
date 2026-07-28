@@ -2,14 +2,15 @@
 import { createSystem, World, Group, Mesh, BoxGeometry, SphereGeometry, CylinderGeometry,
   MeshBasicMaterial, EdgesGeometry, LineSegments, LineBasicMaterial, Color,
   OctahedronGeometry, TorusGeometry } from '@iwsdk/core';
-import { gameState, EnemyData, EggData, PowerUpData, ScorePopup, PLATFORMS, GRAVITY, FLAP_IMPULSE,
+import { gameState, EnemyData, EggData, PowerUpData, ScorePopup, FireballData, PLATFORMS, GRAVITY, FLAP_IMPULSE,
   FLAP_COOLDOWN, MOVE_SPEED, MAX_VY, DRAG, LAVA_Y, ARENA_W, ARENA_H,
   INVINCIBILITY_TIME, POWERUP_DURATION, POWERUP_DROP_CHANCE, MAGNET_RANGE,
   POWERUP_COLORS, PowerUpType } from './game-state.js';
 
 const HALF_W = ARENA_W / 2;
-const ENEMY_COLORS: Record<string, number> = { bounder: 0x44ff44, hunter: 0xffff44, shadow: 0xff4444 };
-const ENEMY_SCORES: Record<string, number> = { bounder: 100, hunter: 200, shadow: 500 };
+const ENEMY_COLORS: Record<string, number> = { bounder: 0x44ff44, hunter: 0xffff44, shadow: 0xff4444, dragon: 0xff6600 };
+const ENEMY_SCORES: Record<string, number> = { bounder: 100, hunter: 200, shadow: 500, dragon: 2000 };
+const ENEMY_HP: Record<string, number> = { bounder: 1, hunter: 1, shadow: 2, dragon: 5 };
 const EGG_SCORE = 150;
 const PTERO_SCORE = 1000;
 const HATCH_TIME = 6;
@@ -18,6 +19,9 @@ const JOUST_DIST = 1.2;
 const EGG_COLLECT_DIST = 1.0;
 const PTERO_HIT_DIST = 1.5;
 const POWERUP_COLLECT_DIST = 1.0;
+const FIREBALL_SPEED = 8;
+const FIREBALL_HIT_DIST = 0.8;
+const BOSS_WAVE_INTERVAL = 5;
 const POWERUP_TYPES: PowerUpType[] = ['shield', 'speed', 'magnet', 'double'];
 
 function diffMul(): number {
@@ -106,6 +110,71 @@ function createPteroMesh(): Group {
   return g;
 }
 
+function createDragonMesh(): { group: Group; wingL: Mesh; wingR: Mesh } {
+  const g = new Group();
+  const mat = new MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.75 });
+  const edgeMat = new LineBasicMaterial({ color: 0xff8800 });
+  // Larger body
+  const bodyGeo = new SphereGeometry(0.6, 10, 8);
+  bodyGeo.scale(1.4, 0.9, 0.9);
+  const body = new Mesh(bodyGeo, mat);
+  g.add(body);
+  g.add(new LineSegments(new EdgesGeometry(bodyGeo), edgeMat));
+  // Head
+  const headGeo = new SphereGeometry(0.3, 8, 6);
+  const head = new Mesh(headGeo, mat);
+  head.position.set(0.5, 0.3, 0);
+  g.add(head);
+  // Horns
+  const hornGeo = new CylinderGeometry(0, 0.06, 0.4, 4);
+  const hornMat = new MeshBasicMaterial({ color: 0xffcc00 });
+  const hornL = new Mesh(hornGeo, hornMat);
+  hornL.position.set(0.4, 0.6, 0.15);
+  hornL.rotation.z = 0.4;
+  g.add(hornL);
+  const hornR = new Mesh(hornGeo, hornMat);
+  hornR.position.set(0.4, 0.6, -0.15);
+  hornR.rotation.z = 0.4;
+  g.add(hornR);
+  // Tail
+  const tailGeo = new CylinderGeometry(0.08, 0.02, 1.2, 6);
+  const tail = new Mesh(tailGeo, mat);
+  tail.rotation.z = Math.PI / 2;
+  tail.position.set(-0.9, -0.1, 0);
+  g.add(tail);
+  // Large wings
+  const wingGeo = new BoxGeometry(0.7, 0.06, 1.0);
+  const wingMat = new MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.45 });
+  const wingL = new Mesh(wingGeo, wingMat);
+  wingL.position.set(-0.1, 0.25, 0.55);
+  g.add(wingL);
+  const wingR = new Mesh(wingGeo, wingMat);
+  wingR.position.set(-0.1, 0.25, -0.55);
+  g.add(wingR);
+  // Legs
+  const legGeo = new CylinderGeometry(0.05, 0.05, 0.4, 4);
+  const legMat = new MeshBasicMaterial({ color: 0xcc4400 });
+  const legL = new Mesh(legGeo, legMat);
+  legL.position.set(-0.15, -0.55, 0.2);
+  g.add(legL);
+  const legR = new Mesh(legGeo, legMat);
+  legR.position.set(-0.15, -0.55, -0.2);
+  g.add(legR);
+  g.scale.set(1.5, 1.5, 1.5);
+  return { group: g, wingL, wingR };
+}
+
+function createFireballMesh(): Mesh {
+  const geo = new SphereGeometry(0.18, 6, 5);
+  const mat = new MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.85 });
+  const mesh = new Mesh(geo, mat);
+  // Outer glow
+  const glowGeo = new SphereGeometry(0.28, 6, 5);
+  const glowMat = new MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.3 });
+  mesh.add(new Mesh(glowGeo, glowMat));
+  return mesh;
+}
+
 function createPowerUpMesh(type: PowerUpType): Group {
   const g = new Group();
   const color = POWERUP_COLORS[type];
@@ -182,12 +251,14 @@ export class GameSystem extends createSystem({}) {
   private eggs: EggData[] = [];
   private powerUps: PowerUpData[] = [];
   private scorePopups: ScorePopup[] = [];
+  private fireballs: FireballData[] = [];
   private pteroMesh: Group | null = null;
   private platformMeshes: Group[] = [];
   private lavaMesh: Mesh | null = null;
   private wallMeshes: Mesh[] = [];
   private inputState = { left: false, right: false, flap: false, flapPressed: false };
   private prevColorScheme = 0;
+  private cameraBasePos = { x: 0, y: 6.5, z: 18 };
 
   init() {
     gameState.loadStats();
@@ -311,23 +382,38 @@ export class GameSystem extends createSystem({}) {
     for (const e of this.eggs) this.world.scene.remove(e.mesh);
     for (const p of this.powerUps) this.world.scene.remove(p.mesh);
     for (const s of this.scorePopups) this.world.scene.remove(s.mesh);
+    for (const f of this.fireballs) this.world.scene.remove(f.mesh);
     this.enemies = [];
     this.eggs = [];
     this.powerUps = [];
     this.scorePopups = [];
+    this.fireballs = [];
     if (this.pteroMesh) { this.world.scene.remove(this.pteroMesh); this.pteroMesh = null; }
     gameState.pteroActive = false;
+    gameState.bossWave = false;
   }
 
   private spawnWave() {
-    const spec = waveEnemies(gameState.wave);
     gameState.waveStarting = true;
     gameState.waveClearTimer = 0;
     gameState.waveTimer = 0;
     gameState.noDeathThisWave = true;
-    for (const s of spec) {
-      for (let i = 0; i < s.count; i++) {
-        this.spawnEnemy(s.type as any);
+    // Boss wave every BOSS_WAVE_INTERVAL waves
+    if (gameState.wave > 1 && gameState.wave % BOSS_WAVE_INTERVAL === 0) {
+      gameState.bossWave = true;
+      this.spawnDragon();
+      // Spawn fewer regular enemies alongside
+      const escorts = Math.floor(gameState.wave / 5);
+      for (let i = 0; i < Math.min(escorts, 4); i++) {
+        this.spawnEnemy(i < escorts / 2 ? 'shadow' : 'hunter');
+      }
+    } else {
+      gameState.bossWave = false;
+      const spec = waveEnemies(gameState.wave);
+      for (const s of spec) {
+        for (let i = 0; i < s.count; i++) {
+          this.spawnEnemy(s.type as any);
+        }
       }
     }
     setTimeout(() => { gameState.waveStarting = false; }, 1500);
@@ -345,6 +431,8 @@ export class GameSystem extends createSystem({}) {
       x, y, vx: -side * (1 + Math.random() * 2) * diffMul(), vy: 0,
       type: type as any, facing: -side, flapTimer: Math.random() * 1.5,
       mesh: group, wingL, wingR, alive: true,
+      hp: ENEMY_HP[type] ?? 1, maxHp: ENEMY_HP[type] ?? 1,
+      hitFlashTimer: 0, fireTimer: 0,
     });
   }
 
@@ -386,6 +474,41 @@ export class GameSystem extends createSystem({}) {
     this.pteroMesh.position.set(gameState.pteroX, gameState.pteroY, 0);
     this.pteroMesh.scale.x = -side;
     this.world.scene.add(this.pteroMesh);
+  }
+
+  private spawnDragon() {
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const x = side * (HALF_W + 0.5);
+    const y = 8 + Math.random() * 3;
+    const { group, wingL, wingR } = createDragonMesh();
+    group.position.set(x, y, 0);
+    group.scale.x = -side;
+    this.world.scene.add(group);
+    const hp = ENEMY_HP.dragon + Math.floor(gameState.wave / 10);
+    this.enemies.push({
+      x, y, vx: -side * 2, vy: 0,
+      type: 'dragon', facing: -side, flapTimer: 1.0,
+      mesh: group, wingL, wingR, alive: true,
+      hp, maxHp: hp, hitFlashTimer: 0,
+      fireTimer: 2.5 + Math.random(),
+    });
+  }
+
+  private spawnFireball(x: number, y: number, facing: number) {
+    const mesh = createFireballMesh();
+    mesh.position.set(x + facing * 0.8, y, 0);
+    this.world.scene.add(mesh);
+    const dx = gameState.playerX - x;
+    const dy = gameState.playerY - y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const nx = dist > 0.1 ? dx / dist : facing;
+    const ny = dist > 0.1 ? dy / dist : 0;
+    this.fireballs.push({
+      x: x + facing * 0.8, y,
+      vx: nx * FIREBALL_SPEED, vy: ny * FIREBALL_SPEED,
+      mesh, life: 3.0,
+    });
+    gameState.sfxAction = 'fireball';
   }
 
   private addShieldVisual() {
@@ -493,6 +616,8 @@ export class GameSystem extends createSystem({}) {
     this.updateScorePopups(dt);
     // Pterodactyl
     this.updatePtero(dt);
+    // Fireballs
+    this.updateFireballs(dt);
 
     // Wave check
     if (!gameState.waveStarting && this.enemies.length === 0 && this.eggs.length === 0) {
@@ -521,6 +646,25 @@ export class GameSystem extends createSystem({}) {
     if (this.lavaMesh) {
       this.lavaMesh.position.y = 0.05 * Math.sin(_time * 3);
       (this.lavaMesh.material as MeshBasicMaterial).opacity = 0.4 + 0.15 * Math.sin(_time * 5);
+    }
+
+    // Camera shake
+    if (gameState.cameraShake > 0) {
+      gameState.cameraShake -= dt;
+      const intensity = gameState.cameraShake * 3;
+      const sx = (Math.random() - 0.5) * intensity;
+      const sy = (Math.random() - 0.5) * intensity;
+      this.world.camera.position.set(
+        this.cameraBasePos.x + sx,
+        this.cameraBasePos.y + sy,
+        this.cameraBasePos.z,
+      );
+      if (gameState.cameraShake <= 0) {
+        gameState.cameraShake = 0;
+        this.world.camera.position.set(
+          this.cameraBasePos.x, this.cameraBasePos.y, this.cameraBasePos.z,
+        );
+      }
     }
 
     // Shield visual animation
@@ -683,12 +827,32 @@ export class GameSystem extends createSystem({}) {
 
   private defeatEnemy(idx: number) {
     const e = this.enemies[idx];
+    e.hp--;
+    if (e.hp > 0) {
+      // Hit but not killed — bounce and flash
+      e.hitFlashTimer = 0.3;
+      e.vy = 4;
+      e.vx = (gameState.playerX > e.x ? -3 : 3);
+      gameState.sfxAction = 'joust_win';
+      gameState.cameraShake = 0.15;
+      // Score for hit
+      const hitScore = 50 * (e.type === 'dragon' ? 2 : 1);
+      this.addScore(hitScore);
+      this.spawnScorePopup(e.x, e.y, hitScore, 'HIT!');
+      return;
+    }
+    // Fully defeated
     e.alive = false;
     this.world.scene.remove(e.mesh);
     this.spawnEgg(e.x, e.y);
-    // Power-up drop chance
-    if (Math.random() < POWERUP_DROP_CHANCE) {
+    // Power-up drop chance (higher for bosses)
+    const dropChance = e.type === 'dragon' ? 1.0 : POWERUP_DROP_CHANCE;
+    if (Math.random() < dropChance) {
       this.spawnPowerUp(e.x, e.y + 0.5);
+      if (e.type === 'dragon') {
+        // Boss drops extra power-up
+        this.spawnPowerUp(e.x + 1, e.y + 1);
+      }
     }
     this.enemies.splice(idx, 1);
     gameState.combo++;
@@ -701,7 +865,13 @@ export class GameSystem extends createSystem({}) {
     this.spawnScorePopup(e.x, e.y, points);
     gameState.killsThisGame++;
     gameState.totalKillsAll++;
-    gameState.sfxAction = 'joust_win';
+    if (e.type === 'dragon') {
+      gameState.bossDefeated++;
+      gameState.cameraShake = 0.5;
+      gameState.sfxAction = 'boss_defeat';
+    } else {
+      gameState.sfxAction = 'joust_win';
+    }
     gameState.checkAchievements();
     gameState.saveStats();
   }
@@ -761,6 +931,7 @@ export class GameSystem extends createSystem({}) {
     gameState.combo = 0;
     gameState.respawnTimer = 2;
     gameState.sfxAction = 'death';
+    gameState.cameraShake = 0.3;
     this.playerMesh.visible = false;
     this.deactivatePowerUp();
     if (gameState.lives <= 0 && gameState.mode !== 'zen') {
@@ -784,23 +955,44 @@ export class GameSystem extends createSystem({}) {
   private updateEnemies(dt: number) {
     for (const e of this.enemies) {
       if (!e.alive) continue;
+      // Hit flash
+      if (e.hitFlashTimer > 0) {
+        e.hitFlashTimer -= dt;
+        const body = e.mesh.children[0] as Mesh;
+        if (body) {
+          (body.material as MeshBasicMaterial).opacity = Math.floor(e.hitFlashTimer * 20) % 2 === 0 ? 0.9 : 0.2;
+        }
+        if (e.hitFlashTimer <= 0) {
+          const body2 = e.mesh.children[0] as Mesh;
+          if (body2) (body2.material as MeshBasicMaterial).opacity = 0.7;
+        }
+      }
       e.flapTimer -= dt;
       if (e.flapTimer <= 0) {
-        const flapRate = e.type === 'shadow' ? 0.4 : e.type === 'hunter' ? 0.7 : 1.0;
+        const flapRate = e.type === 'shadow' ? 0.4 : e.type === 'dragon' ? 0.5 : e.type === 'hunter' ? 0.7 : 1.0;
         e.flapTimer = flapRate + Math.random() * flapRate;
         e.vy = Math.min(e.vy + FLAP_IMPULSE * 0.8, MAX_VY * 0.8);
       }
-      if (e.type === 'hunter' || e.type === 'shadow') {
-        const spd = e.type === 'shadow' ? 4 : 2.5;
+      if (e.type === 'hunter' || e.type === 'shadow' || e.type === 'dragon') {
+        const spd = e.type === 'dragon' ? 3 : e.type === 'shadow' ? 4 : 2.5;
         const tx = gameState.playerAlive ? gameState.playerX : 0;
         if (tx > e.x + 0.5) e.vx += spd * dt * diffMul();
         else if (tx < e.x - 0.5) e.vx -= spd * dt * diffMul();
+        // Dragon breathes fire
+        if (e.type === 'dragon' && gameState.playerAlive) {
+          e.fireTimer -= dt;
+          if (e.fireTimer <= 0) {
+            e.fireTimer = 2.0 + Math.random() * 1.5;
+            this.spawnFireball(e.x, e.y, e.facing);
+          }
+        }
       } else {
         if (Math.random() < 0.02) e.vx += (Math.random() - 0.5) * 3;
       }
       e.vy += GRAVITY * dt;
       e.vx *= DRAG;
-      e.vx = Math.max(-MOVE_SPEED, Math.min(MOVE_SPEED, e.vx));
+      const maxSpd = e.type === 'dragon' ? MOVE_SPEED * 0.7 : MOVE_SPEED;
+      e.vx = Math.max(-maxSpd, Math.min(maxSpd, e.vx));
       e.vy = Math.max(-MAX_VY, Math.min(MAX_VY * 0.8, e.vy));
       e.x += e.vx * dt;
       e.y += e.vy * dt;
@@ -811,7 +1003,7 @@ export class GameSystem extends createSystem({}) {
       if (e.y < LAVA_Y + 0.3) { e.y = LAVA_Y + 0.3; e.vy = 5; }
       e.facing = e.vx >= 0 ? 1 : -1;
       e.mesh.position.set(e.x, e.y, 0);
-      e.mesh.scale.x = e.facing;
+      e.mesh.scale.x = e.facing * (e.type === 'dragon' ? 1.5 : 1);
       const wingAngle = Math.sin(performance.now() * 0.012 + e.x) * 0.4;
       e.wingL.rotation.x = wingAngle;
       e.wingR.rotation.x = -wingAngle;
@@ -852,6 +1044,7 @@ export class GameSystem extends createSystem({}) {
           x: egg.x, y: egg.y, vx: (Math.random() - 0.5) * 3, vy: 4,
           type: 'hunter', facing: 1, flapTimer: 0.5,
           mesh: group, wingL, wingR, alive: true,
+          hp: 1, maxHp: 1, hitFlashTimer: 0, fireTimer: 0,
         });
         gameState.sfxAction = 'hatch';
         continue;
@@ -932,6 +1125,43 @@ export class GameSystem extends createSystem({}) {
       this.world.scene.remove(this.pteroMesh);
       this.pteroMesh = null;
       gameState.pteroActive = false;
+    }
+  }
+
+  private updateFireballs(dt: number) {
+    for (let i = this.fireballs.length - 1; i >= 0; i--) {
+      const f = this.fireballs[i];
+      f.life -= dt;
+      f.x += f.vx * dt;
+      f.y += f.vy * dt;
+      f.mesh.position.set(f.x, f.y, 0);
+      f.mesh.rotation.z += dt * 8;
+      // Scale pulsing
+      const scale = 0.9 + Math.sin(f.life * 15) * 0.15;
+      f.mesh.scale.setScalar(scale);
+      // Remove if expired or out of bounds
+      if (f.life <= 0 || Math.abs(f.x) > HALF_W + 3 || f.y < -1 || f.y > ARENA_H + 2) {
+        this.world.scene.remove(f.mesh);
+        this.fireballs.splice(i, 1);
+        continue;
+      }
+      // Hit player
+      if (gameState.playerAlive && !gameState.isInvincible) {
+        const dx = gameState.playerX - f.x;
+        const dy = gameState.playerY - f.y;
+        if (Math.sqrt(dx * dx + dy * dy) < FIREBALL_HIT_DIST) {
+          if (gameState.shieldActive) {
+            this.deactivatePowerUp();
+            gameState.sfxAction = 'shield_break';
+            gameState.playerVY = 4;
+          } else {
+            this.playerDeath();
+          }
+          this.world.scene.remove(f.mesh);
+          this.fireballs.splice(i, 1);
+          gameState.cameraShake = 0.2;
+        }
+      }
     }
   }
 
