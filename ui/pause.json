@@ -1,0 +1,184 @@
+{
+  "element": {
+    "sourceTag": "panel",
+    "type": "custom",
+    "children": [
+      {
+        "sourceTag": "text",
+        "type": "custom",
+        "children": [
+          {
+            "sourceTag": "panel",
+            "type": "custom",
+            "children": [
+              {
+                "sourceTag": "text",
+                "type": "custom",
+                "children": [],
+                "properties": {
+                  "content": "RESUME",
+                  "fontsize": "20",
+                  "fontweight": "bold",
+                  "color": "#00ffff"
+                },
+                "dataUid": "uid-4"
+              }
+            ],
+            "properties": {
+              "id": "btn-resume",
+              "width": "240",
+              "height": "44",
+              "backgroundcolor": "#003344",
+              "backgroundopacity": "0.8",
+              "borderradius": "8",
+              "bordercolor": "#00ffff",
+              "borderwidth": "1",
+              "justifycontent": "center",
+              "alignitems": "center",
+              "cursor": "pointer"
+            },
+            "dataUid": "uid-3"
+          },
+          {
+            "sourceTag": "panel",
+            "type": "custom",
+            "children": [
+              {
+                "sourceTag": "text",
+                "type": "custom",
+                "children": [],
+                "properties": {
+                  "content": "QUIT",
+                  "fontsize": "20",
+                  "fontweight": "bold",
+                  "color": "#ff4444"
+                },
+                "dataUid": "uid-6"
+              }
+            ],
+            "properties": {
+              "id": "btn-quit",
+              "width": "240",
+              "height": "44",
+              "backgroundcolor": "#330011",
+              "backgroundopacity": "0.8",
+              "borderradius": "8",
+              "bordercolor": "#ff4444",
+              "borderwidth": "1",
+              "justifycontent": "center",
+              "alignitems": "center",
+              "cursor": "pointer"
+            },
+            "dataUid": "uid-5"
+          },
+          {
+            "sourceTag": "text",
+            "type": "custom",
+            "children": [],
+            "properties": {
+              "content": "ESC / P to resume",
+              "fontsize": "12",
+              "color": "#668888"
+            },
+            "dataUid": "uid-7"
+          }
+        ],
+        "properties": {
+          "content": "PAUSED",
+          "fontsize": "32",
+          "fontweight": "bold",
+          "color": "#00ffff",
+          "marginbottom": "10"
+        },
+        "dataUid": "uid-2"
+      }
+    ],
+    "properties": {
+      "width": "320",
+      "height": "260",
+      "backgroundcolor": "#000a18",
+      "backgroundopacity": "0.95",
+      "borderradius": "12",
+      "bordercolor": "#00ffff",
+      "borderwidth": "2",
+      "flexdirection": "column",
+      "alignitems": "center",
+      "padding": "20",
+      "gap": "14"
+    },
+    "dataUid": "uid-1"
+  },
+  "classes": {},
+  "ranges": {
+    "uid-1": {
+      "start": {
+        "line": 0,
+        "column": 0
+      },
+      "end": {
+        "line": 9,
+        "column": 8
+      }
+    },
+    "uid-2": {
+      "start": {
+        "line": 1,
+        "column": 2
+      },
+      "end": {
+        "line": 9,
+        "column": 0
+      }
+    },
+    "uid-3": {
+      "start": {
+        "line": 2,
+        "column": 2
+      },
+      "end": {
+        "line": 4,
+        "column": 10
+      }
+    },
+    "uid-4": {
+      "start": {
+        "line": 3,
+        "column": 4
+      },
+      "end": {
+        "line": 4,
+        "column": 2
+      }
+    },
+    "uid-5": {
+      "start": {
+        "line": 5,
+        "column": 2
+      },
+      "end": {
+        "line": 7,
+        "column": 10
+      }
+    },
+    "uid-6": {
+      "start": {
+        "line": 6,
+        "column": 4
+      },
+      "end": {
+        "line": 7,
+        "column": 2
+      }
+    },
+    "uid-7": {
+      "start": {
+        "line": 8,
+        "column": 2
+      },
+      "end": {
+        "line": 9,
+        "column": 0
+      }
+    }
+  }
+}
